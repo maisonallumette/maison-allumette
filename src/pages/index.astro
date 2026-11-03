@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { products } from '../data/products';
+const reassurance = [
+  ['Livraison soignée', 'Colis kraft emballé à la main, expédié depuis Mont-de-Marsan.'],
+  ['14 jours pour changer d’avis', 'Un souci ? Écrivez-nous, on trouve une solution.'],
+  ['Paiement 100 % sécurisé', 'Carte bancaire via un prestataire certifié.'],
+  ['Clients ravis', 'Des bougies qui font plaisir, des cadeaux qui touchent.'],
+];
+---
+<Base>
+  <!-- HERO -->
+  <section class="bg-lin/40">
+    <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:py-24">
+      <div>
+        <p class="text-xs uppercase tracking-[.25em] text-cuivre">Artisanat des Landes</p>
+        <h1 class="mt-3 font-serif text-5xl leading-[1.05] md:text-6xl">L’art d’allumer des ambiances</h1>
+        <p class="mt-5 max-w-md text-base/7">Bougies fleuries, fondants et parfums d’intérieur faits main, en cire végétale, avec des fragrances de Grasse et des fleurs séchées d’ici.</p>
+        <a href="/boutique" class="mt-8 inline-block rounded-full bg-sapin px-8 py-4 text-sm font-medium text-creme transition hover:bg-cuivre">Acheter maintenant</a>
+      </div>
+      <img src="/placeholder.svg" alt="Bougie fleurie Maison Allumette" class="aspect-[4/3] w-full rounded-3xl object-cover" /> <!-- Photo hero à remplacer -->
+    </div>
+  </section>
+
+  <!-- PRODUITS VEDETTES -->
+  <section class="mx-auto max-w-6xl px-4 pt-16">
+    <h2 class="font-serif text-4xl">Nos coups de cœur</h2>
+    <p class="mt-1 text-sm text-encre/70">Faits main, en petites séries.</p>
+    <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+      {products.slice(0, 4).map((p) => <ProductCard p={p} />)}
+    </div>
+    <p class="mt-10 text-center"><a href="/boutique" class="border-b border-cuivre pb-1 text-sm">Voir toute la boutique</a></p>
+  </section>
+
+  <!-- RÉASSURANCE -->
+  <section class="mx-auto mt-20 max-w-6xl px-4">
+    <ul class="grid gap-6 rounded-3xl border border-lin bg-white p-8 sm:grid-cols-2 lg:grid-cols-4">
+      {reassurance.map(([t, d]) => <li><p class="font-serif text-xl">{t}</p><p class="mt-1 text-sm text-encre/70">{d}</p></li>)}
+    </ul>
+    <!-- Avis : remplace par de VRAIS avis clients (jamais d’avis inventés) -->
+    <blockquote class="mx-auto mt-12 max-w-xl text-center font-serif text-2xl italic">« Ton premier vrai avis client ira ici. »</blockquote>
+  </section>
+</Base>

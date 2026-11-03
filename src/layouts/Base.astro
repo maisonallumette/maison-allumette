@@ -1,0 +1,97 @@
+---
+import '../styles/global.css';
+const { title = 'Maison Allumette | Bougies et parfums d’intérieur faits main', description = 'Bougies fleuries, fondants, suspensions, diffuseurs voiture et tablettes parfumées, faits main dans les Landes.' } = Astro.props;
+---
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title><meta name="description" content={description} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Montserrat:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-creme font-sans text-encre antialiased">
+  <p class="bg-sapin px-4 py-2 text-center text-xs text-creme">Fait main dans les Landes · Livraison offerte dès 49 € <!-- À ajuster --></p>
+
+  <!-- HEADER : logo, recherche, mini-panier (mobile first : la recherche passe sur la 2e ligne) -->
+  <header class="sticky top-0 z-30 border-b border-lin bg-creme/95 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+      <a href="/" class="font-serif text-2xl font-semibold tracking-wide">Maison Allumette</a>
+      <form action="/boutique" class="order-3 w-full md:order-none md:ml-6 md:w-auto md:flex-1" role="search">
+        <input type="search" name="q" placeholder="Rechercher une bougie, un parfum…" aria-label="Rechercher"
+          class="w-full rounded-full border border-lin bg-white px-4 py-2 text-sm outline-none focus:border-cuivre md:max-w-md" />
+      </form>
+      <!-- Mini-panier -->
+      <details class="relative ml-auto">
+        <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-lin px-4 py-2 text-sm">
+          Panier <span data-cart-count class="rounded-full bg-cuivre px-2 text-xs text-creme">0</span>
+        </summary>
+        <div class="absolute right-0 mt-2 w-72 rounded-2xl border border-lin bg-white p-4 shadow-lg">
+          <ul data-cart-list class="space-y-2 text-sm"></ul>
+          <p class="mt-3 flex justify-between border-t border-lin pt-3 text-sm font-medium"><span>Total</span><span data-cart-total>0,00 €</span></p>
+          <!-- À CONFIGURER : remplacer # par ton lien de paiement SumUp / Stripe -->
+          <a href="#" class="mt-3 block rounded-full bg-encre py-3 text-center text-sm text-creme">Commander</a>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <main><slot /></main>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 bg-encre text-creme">
+    <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-3">
+      <div>
+        <p class="font-serif text-2xl">Maison Allumette</p>
+        <p class="mt-2 text-sm text-lin">L’art d’allumer des ambiances. Fabriqué à la main dans les Landes.</p>
+        <p class="mt-4 flex gap-4 text-sm">
+          <a href="https://www.instagram.com/" rel="noopener">Instagram</a>
+          <a href="https://www.facebook.com/" rel="noopener">Facebook</a> <!-- À remplacer par tes vrais liens -->
+        </p>
+      </div>
+      <nav aria-label="Informations légales" class="text-sm">
+        <p class="mb-2 font-medium">Informations</p>
+        <ul class="space-y-1 text-lin">
+          <li><a href="/mentions-legales">Mentions légales</a></li><li><a href="/cgv">CGV</a></li>
+          <li><a href="/livraison-retours">Livraison et retours</a></li><li><a href="/confidentialite">Confidentialité</a></li>
+        </ul>
+      </nav>
+      <form action="#" method="post" class="text-sm"> <!-- À CONFIGURER : service d’e-mailing (Brevo, MailerLite…) -->
+        <p class="mb-2 font-medium">Une lettre douce, une fois par mois</p>
+        <p class="mb-3 text-lin">Nouveautés et coulisses de l’atelier, directement dans votre boîte mail.</p>
+        <div class="flex gap-2">
+          <input type="email" required placeholder="Votre e-mail" aria-label="E-mail" class="min-w-0 flex-1 rounded-full px-4 py-2 text-encre" />
+          <button class="rounded-full bg-cuivre px-4 py-2">Je m’inscris</button>
+        </div>
+      </form>
+    </div>
+    <p class="border-t border-white/10 py-4 text-center text-xs text-lin">© {new Date().getFullYear()} Maison Allumette</p>
+  </footer>
+
+  <!-- Panier léger stocké dans le navigateur (localStorage). Le paiement réel reste à brancher. -->
+  <script>
+    type Item = { id: string; name: string; price: number; qty: number };
+    const KEY = 'ma-cart';
+    const read = (): Item[] => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } };
+    const eur = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+    function render() {
+      const c = read();
+      document.querySelectorAll('[data-cart-count]').forEach((e) => (e.textContent = String(c.reduce((s, i) => s + i.qty, 0))));
+      document.querySelector('[data-cart-total]')!.textContent = eur(c.reduce((s, i) => s + i.qty * i.price, 0));
+      const ul = document.querySelector('[data-cart-list]')!;
+      ul.replaceChildren(...(c.length ? c : [{ name: 'Votre panier est vide', qty: 0, price: 0 } as Item]).map((i) => {
+        const li = document.createElement('li'); li.className = 'flex justify-between gap-2';
+        li.textContent = i.qty ? `${i.qty} × ${i.name}` : i.name; return li;
+      }));
+    }
+    document.addEventListener('click', (ev) => {
+      const b = (ev.target as HTMLElement).closest<HTMLElement>('[data-add]'); if (!b) return;
+      const c = read(); const id = b.dataset.id!; const f = c.find((i) => i.id === id);
+      f ? f.qty++ : c.push({ id, name: b.dataset.name!, price: Number(b.dataset.price), qty: 1 });
+      localStorage.setItem(KEY, JSON.stringify(c)); render();
+      document.querySelector('header details')?.setAttribute('open', '');
+    });
+    render();
+  </script>
+</body>
+</html>
