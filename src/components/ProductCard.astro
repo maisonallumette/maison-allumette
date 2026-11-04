@@ -2,15 +2,13 @@
 import { eur } from '../data/products';
 const { p } = Astro.props;
 ---
-<article class="group flex flex-col" data-search={`${p.name} ${p.category}`.toLowerCase()}>
-  <a href={`/produits/${p.slug}`} class="block aspect-square overflow-hidden rounded-2xl bg-lin/40">
-    <img src={p.image} alt={p.name} loading="lazy" class="size-full object-cover transition duration-500 group-hover:scale-105" />
-  </a>
-  <div class="mt-3 flex-1">
-    <p class="text-[11px] uppercase tracking-[.2em] text-cuivre">{p.category}</p>
-    <h3 class="font-serif text-2xl leading-tight"><a href={`/produits/${p.slug}`}>{p.name}</a></h3>
-    <p class="mt-1 text-sm">{eur(p.price)}</p>
+<article class="flex flex-col" data-search={`${p.name} ${p.category}`.toLowerCase()}>
+  <div class="relative aspect-square bg-creme">
+    <a href={`/produits/${p.slug}`}><img src={p.image} alt={p.name} loading="lazy" class="size-full object-cover" /></a>
+    <button data-add data-id={p.slug} data-name={p.name} data-price={p.price}
+      class="absolute inset-x-0 bottom-0 border border-olive bg-creme py-2 text-xs font-medium uppercase tracking-wider transition hover:bg-olive hover:text-creme">Ajouter au panier</button>
   </div>
-  <button data-add data-id={p.slug} data-name={p.name} data-price={p.price}
-    class="mt-3 rounded-full bg-sapin px-4 py-3 text-sm text-creme transition hover:bg-cuivre">Ajouter au panier</button>
+  <h3 class="h-title mt-3 text-lg leading-tight"><a href={`/produits/${p.slug}`}>{p.name}</a></h3>
+  <p class="mt-1 font-serif text-sm italic text-encre/70">{p.short}</p>
+  <p class="mt-2 text-sm font-semibold">{eur(p.price)}</p>
 </article>

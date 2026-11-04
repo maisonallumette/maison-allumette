@@ -1,0 +1,10 @@
+---
+// Sceau rond « Homemade in Landes » (provisoire, à remplacer par le fichier du designer)
+const { class: c = '' } = Astro.props;
+---
+<svg viewBox="0 0 100 100" class={c} role="img" aria-label="Homemade in Landes">
+  <circle cx="50" cy="50" r="49" fill="#d4532b" />
+  <defs><path id="seal-arc" d="M50,50 m-34,0 a34,34 0 1,1 68,0 a34,34 0 1,1 -68,0" /></defs>
+  <text font-size="9" letter-spacing="2.2" fill="#f6f1e7" font-family="Montserrat, sans-serif"><textPath href="#seal-arc">HOMEMADE · IN LANDES ·</textPath></text>
+  <circle cx="50" cy="50" r="9" fill="none" stroke="#f6f1e7" stroke-width="1.5" />
+</svg>
