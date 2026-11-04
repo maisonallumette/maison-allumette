@@ -27,4 +27,5 @@
 header.site { background: transparent; border-bottom: 1px solid transparent; transition: background-color .3s, border-color .3s; }
 header.site.is-scrolled { background: #fff; border-bottom-color: #d9cfba; }
 header.site .logo-wrap { transition: transform .3s; transform-origin: center top; }
-header.site:not(.is-scrolled) .logo-wrap { transform: scale(1.35); }
+header.site:not(.is-scrolled) .logo-wrap { transform: scale(1.1); }
+@media (min-width: 48rem) { header.site:not(.is-scrolled) .logo-wrap { transform: scale(1.35); } }

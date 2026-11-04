@@ -5,7 +5,7 @@ export function getStaticPaths() { return products.map((p) => ({ params: { slug:
 const { p } = Astro.props;
 ---
 <Base title={`${p.name} | Maison Allumette`} description={p.short}>
-  <article class="pb-28 md:mx-auto md:grid md:max-w-6xl md:grid-cols-2 md:gap-10 md:px-4">
+  <article class="md:mx-auto md:grid md:max-w-6xl md:grid-cols-2 md:gap-10 md:px-4">
     <img src={p.image} alt={p.name} class="aspect-square w-full object-cover" />
     <div class="bg-creme p-5 md:bg-transparent md:p-0">
       <div class="flex justify-between gap-4"><h1 class="h-title text-3xl leading-tight">{p.name}</h1><p class="text-lg font-semibold">{eur(p.price)}</p></div>
@@ -25,4 +25,6 @@ const { p } = Astro.props;
       <select data-qty aria-label="Quantité" class="w-20 bg-lin px-3 text-sm">{[1,2,3,4,5,6].map((n) => <option>{n}</option>)}</select>
     </div>
   </div>
+  <!-- Réserve la hauteur de la barre d'achat pour qu'elle ne masque pas le bas du pied de page -->
+  <style is:global>body { padding-bottom: 5.75rem; }</style>
 </Base>
