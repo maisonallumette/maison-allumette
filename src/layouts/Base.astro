@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { categories, products } from '../data/products';
+import { categories, products, eur } from '../data/products';
 import PhotoCadree from '../components/PhotoCadree.astro';
 const { overlay = false, title = 'Maison Allumette | Réchauffez vos intérieurs', description = 'Bougies fleuries, fondants, suspensions, diffuseurs voiture et tablettes parfumées, faits main dans les Landes.' } = Astro.props;
 // La catégorie « Collections capsules » a sa place à droite de l'en-tête, les autres à gauche
@@ -57,8 +57,8 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
   <!-- PANNEAU DU MENU : ouvert par une catégorie, la loupe ou le burger. Onglets des catégories, recherche, sous-catégories, produits -->
   <!-- Le panneau et le voile apparaissent en fondu ; le reste du site devient flou derrière -->
   <div data-overlay class="fondu fixed inset-0 z-40 bg-encre/30 backdrop-blur-md"></div>
-  <aside id="panneau" data-panneau role="dialog" aria-modal="true" aria-label="Menu de la boutique" inert class="fondu fixed inset-y-0 left-0 z-50 flex w-[88%] max-w-md bg-white shadow-xl lg:w-auto lg:max-w-none">
-    <div class="flex w-full flex-col overflow-y-auto lg:w-[30rem]">
+  <aside id="panneau" data-panneau role="dialog" aria-modal="true" aria-label="Menu de la boutique" inert class="fondu fixed inset-y-2 left-2 z-50 flex w-[88%] max-w-md bg-white shadow-2xl md:inset-y-6 md:left-6 lg:w-auto lg:max-w-[calc(100vw-3rem)]">
+    <div class="flex w-full flex-col overflow-y-auto lg:w-[30rem] lg:flex-none">
       <div class="flex items-start gap-3 border-b border-lin px-6 pb-3 pt-6">
         <div class="flex flex-1 flex-wrap gap-x-5 gap-y-3 text-xs font-semibold uppercase tracking-wider">
           {categories.map((c) => <button type="button" data-onglet={c.slug} aria-pressed="false" class="border-b-2 border-transparent pb-1 text-left uppercase aria-pressed:border-terracotta">{c.name}</button>)}
@@ -69,14 +69,21 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
         <input data-recherche name="q" type="search" placeholder="Bougie, fondant, fleurs…" aria-label="Rechercher un produit" class="min-w-0 flex-1 bg-transparent px-4 py-3 text-base md:text-sm" />
         <button aria-label="Lancer la recherche" class="px-3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-5"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button>
       </form>
+      <!-- Chaque ligne : le nom mène à la page, la flèche « › » agrandit le cadre vers la droite pour en montrer plus -->
       {categories.map((c) => {
         const liste = produitsDe(c.slug);
+        const lignes = c.subcategories.length > 0
+          ? c.subcategories.map((s) => ({ href: `/boutique?categorie=${c.slug}&sous=${s.slug}`, nom: s.name, cle: `sous/${c.slug}/${s.slug}`, aide: `Voir les produits : ${s.name}` }))
+          : liste.map((p) => ({ href: `/produits/${p.slug}`, nom: p.name, cle: `produit/${p.slug}`, aide: `Aperçu : ${p.name}` }));
         return (
           <div data-section={c.slug} hidden class="px-6 pt-3">
             <ul class="divide-y divide-lin text-sm font-semibold uppercase tracking-wider">
-              {c.subcategories.length > 0
-                ? c.subcategories.map((s) => <li><a href={`/boutique?categorie=${c.slug}&sous=${s.slug}`} class={ligne}>{s.name}<span aria-hidden="true">›</span></a></li>)
-                : liste.map((p) => <li><a href={`/produits/${p.slug}`} class={ligne}>{p.name}<span aria-hidden="true">›</span></a></li>)}
+              {lignes.map((l) => (
+                <li class="flex items-stretch gap-2">
+                  <a href={l.href} class="flex-1 py-4">{l.nom}</a>
+                  <button type="button" data-detail-btn={l.cle} aria-expanded="false" aria-controls="panneau-cote" aria-label={l.aide} class="w-10 flex-none text-lg transition-colors hover:bg-creme aria-expanded:bg-creme">›</button>
+                </li>
+              ))}
               <li><a href={`/boutique?categorie=${c.slug}`} class={`${ligne} normal-case tracking-normal underline underline-offset-4`}>Voir tout : {c.name}<span aria-hidden="true" class="inline-block">›</span></a></li>
             </ul>
             {liste.length === 0 && <p class="pb-2 font-serif italic">De nouvelles créations arrivent bientôt.</p>}
@@ -89,10 +96,11 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
       </ul>
       <a href="/carte-cadeau" class="vichy group m-6 mt-auto block p-5"><span class="flex items-center justify-between gap-3 bg-creme/90 p-4"><span><span class="h-title block">Offrir Maison Allumette</span><span class="mt-1 block font-serif text-sm italic">La carte cadeau, avec un petit mot écrit à la main.</span></span><span aria-hidden="true" class="transition-transform group-hover:translate-x-1">›</span></span></a>
     </div>
-    <!-- Sur grand écran : deux produits de la catégorie choisie -->
-    <div data-cote class="hidden w-80 flex-none overflow-y-auto border-l border-lin p-6">
+    <!-- Colonne de droite (grand écran) : deux produits de la catégorie, ou le détail ouvert par une flèche « › ».
+         Sur téléphone, le détail s'affiche par-dessus le menu, avec un bouton Retour. -->
+    <div id="panneau-cote" data-cote class="cote">
       {categories.map((c) => (
-        <div data-section={c.slug} hidden class="space-y-8">
+        <div data-section={c.slug} hidden class="space-y-8 p-6">
           {produitsDe(c.slug).slice(0, 2).map((p) => (
             <a href={`/produits/${p.slug}`} class="block">
               <PhotoCadree p={p} loading="lazy" />
@@ -100,6 +108,31 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
               <p class="mt-1 font-serif text-sm italic underline underline-offset-4">Découvrir</p>
             </a>
           ))}
+        </div>
+      ))}
+      {categories.flatMap((c) => c.subcategories.map((s) => {
+        const liste = produitsDe(c.slug).filter((p) => p.subcategory === s.slug);
+        return (
+          <div data-detail={`sous/${c.slug}/${s.slug}`} hidden class="p-6">
+            <button type="button" data-retour class="text-xs font-semibold uppercase tracking-wider">‹ Retour</button>
+            <h2 class="h-title mt-4 text-lg">{s.name}</h2>
+            {liste.length > 0
+              ? <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-6">{liste.map((p) => (
+                  <li><a href={`/produits/${p.slug}`} class="block"><PhotoCadree p={p} loading="lazy" /><span class="h-title mt-2 block text-xs">{p.name}</span><span class="mt-1 block text-sm">{eur(p.price)}</span></a></li>
+                ))}</ul>
+              : <p class="mt-6 font-serif italic">De nouvelles créations arrivent bientôt.</p>}
+            <a href={`/boutique?categorie=${c.slug}&sous=${s.slug}`} class="mt-8 block border border-olive py-3 text-center text-xs font-semibold uppercase tracking-wider">Voir tout : {s.name}</a>
+          </div>
+        );
+      }))}
+      {categories.filter((c) => c.subcategories.length === 0).flatMap((c) => produitsDe(c.slug)).map((p) => (
+        <div data-detail={`produit/${p.slug}`} hidden class="p-6">
+          <button type="button" data-retour class="text-xs font-semibold uppercase tracking-wider">‹ Retour</button>
+          <div class="mt-4 max-w-sm"><PhotoCadree p={p} loading="lazy" /></div>
+          <h2 class="h-title mt-4 text-lg">{p.name}</h2>
+          {p.short && <p class="mt-1 font-serif italic">{p.short}</p>}
+          <p class="mt-2 text-sm font-semibold">{eur(p.price)}</p>
+          <a href={`/produits/${p.slug}`} class="mt-6 block max-w-sm border border-olive py-3 text-center text-xs font-semibold uppercase tracking-wider">Découvrir</a>
         </div>
       ))}
     </div>
@@ -144,17 +177,38 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
     const voile = document.querySelector<HTMLElement>('[data-overlay]')!;
     const cote = panneau.querySelector<HTMLElement>('[data-cote]')!;
     const onglets = [...panneau.querySelectorAll<HTMLElement>('[data-onglet]')];
-    let ouvert = false, choisi = '', retour: HTMLElement | null = null;
-    function choisir(slug: string) {
-      choisi = slug;
+    const grandEcran = matchMedia('(min-width: 64rem)');
+    let ouvert = false, choisi = '', detail = '', retour: HTMLElement | null = null, boutonDetail: HTMLElement | null = null;
+    // Colonne de droite : produits de la catégorie, ou détail ouvert par une flèche « › » (le cadre s'élargit)
+    function majCote() {
+      cote.querySelectorAll<HTMLElement>('[data-section]').forEach((s) => (s.hidden = Boolean(detail) || s.dataset.section !== choisi));
+      cote.querySelectorAll<HTMLElement>('[data-detail]').forEach((d) => (d.hidden = d.dataset.detail !== detail));
+      cote.classList.toggle('avec-detail', Boolean(detail));
+      cote.classList.toggle('vide', !detail && !cote.querySelector(`[data-section="${choisi}"] a`));
+      panneau.querySelectorAll<HTMLElement>('[data-detail-btn]').forEach((b) => b.setAttribute('aria-expanded', String(b.dataset.detailBtn === detail)));
+    }
+    function choisir(slug: string, force = false) {
+      if (slug === choisi && !force) return;
+      choisi = slug; detail = '';
       onglets.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.onglet === slug)));
       panneau.querySelectorAll<HTMLElement>('[data-section]').forEach((s) => (s.hidden = s.dataset.section !== slug));
-      // La colonne des photos n'apparaît que si la catégorie a des produits
-      cote.classList.toggle('lg:block', Boolean(cote.querySelector(`[data-section="${slug}"] a`)));
+      majCote();
+    }
+    function montrerDetail(bouton: HTMLElement) {
+      if (detail === bouton.dataset.detailBtn) { fermerDetail(); return; }
+      detail = bouton.dataset.detailBtn!; boutonDetail = bouton;
+      majCote();
+      // Sur téléphone, le détail recouvre le menu : on place le curseur sur « Retour »
+      if (!grandEcran.matches) cote.querySelector<HTMLElement>(`[data-detail="${detail}"] [data-retour]`)?.focus();
+    }
+    function fermerDetail() {
+      detail = '';
+      majCote();
+      boutonDetail?.focus();
     }
     function ouvrir(slug: string, recherche = false) {
       if (!ouvert) retour = document.activeElement as HTMLElement | null;
-      choisir(slug || choisi || onglets[0]?.dataset.onglet || '');
+      choisir(slug || choisi || onglets[0]?.dataset.onglet || '', true);
       ouvert = true;
       panneau.inert = false;
       [panneau, voile].forEach((e) => e.classList.add('est-ouvert'));
@@ -170,9 +224,11 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
       document.documentElement.style.overflow = '';
       retour?.focus();
     }
+    // À la souris, survoler un onglet suffit pour changer de catégorie
+    onglets.forEach((b) => b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') choisir(b.dataset.onglet!); }));
     document.addEventListener('keydown', (ev) => {
       if (!ouvert) return;
-      if (ev.key === 'Escape') { fermer(); return; }
+      if (ev.key === 'Escape') { if (detail) fermerDetail(); else fermer(); return; }
       // La touche Tab reste dans le panneau tant qu'il est ouvert
       if (ev.key !== 'Tab') return;
       const liens = [...panneau.querySelectorAll<HTMLElement>('a[href], button, input')].filter((e) => e.offsetParent !== null);
@@ -189,6 +245,9 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
       if (t.closest('[data-fermer]') || t.closest('[data-overlay]')) { fermer(); return; }
       const onglet = t.closest<HTMLElement>('[data-onglet]');
       if (onglet) { choisir(onglet.dataset.onglet!); return; }
+      const fleche = t.closest<HTMLElement>('[data-detail-btn]');
+      if (fleche) { montrerDetail(fleche); return; }
+      if (t.closest('[data-retour]')) { fermerDetail(); return; }
       const b = t.closest<HTMLElement>('[data-add]'); if (!b) return;
       const sel = document.querySelector<HTMLSelectElement>('[data-qty]');
       const n = b.hasAttribute('data-useqty') && sel ? Number(sel.value) : 1;
