@@ -42,6 +42,14 @@ const texte = (v, max = 5000) => {
   return v;
 };
 
+const nombreEntre = (v, min, max) => {
+  if (typeof v !== 'number' || !Number.isFinite(v) || v < min || v > max) throw new ErreurHttp(400, 'Catalogue invalide : cadrage de photo incorrect.');
+  return v;
+};
+const nettoyerCadrage = (c) => (c === undefined || c === null
+  ? { x: 50, y: 50, zoom: 1 }
+  : { x: nombreEntre(c.x, 0, 100), y: nombreEntre(c.y, 0, 100), zoom: nombreEntre(c.zoom, 1, 3) });
+
 // Un catalogue incorrect casserait la construction du site : on le vérifie et on ne garde que les champs connus
 export function nettoyerCatalogue(c) {
   if (!c || !Array.isArray(c.categories) || !Array.isArray(c.products)) throw new ErreurHttp(400, 'Catalogue invalide.');
@@ -63,7 +71,7 @@ export function nettoyerCatalogue(c) {
     const image = typeof p.image === 'string' ? p.image : '';
     if (image && !PHOTO.test(image)) throw new ErreurHttp(400, 'Catalogue invalide : photo incorrecte.');
     return {
-      slug: slug(p.slug), name: texte(p.name, 200), category: cat.slug, subcategory: sub, price: p.price, image,
+      slug: slug(p.slug), name: texte(p.name, 200), category: cat.slug, subcategory: sub, price: p.price, image, cadrage: nettoyerCadrage(p.cadrage),
       short: texte(p.short ?? '', 300), description: texte(p.description ?? ''),
       notes: (Array.isArray(p.notes) ? p.notes : []).map((n) => texte(n, 300)),
       conseils: texte(p.conseils ?? ''), composition: texte(p.composition ?? ''),

@@ -34,7 +34,7 @@ const reassurance = [['Paiement sécurisé','Carte bancaire via un prestataire c
   <!-- TUILES DE CATÉGORIES (photos à fournir) -->
   <section class="mx-auto mt-12 grid max-w-6xl grid-cols-2 gap-2 px-4 md:grid-cols-4">
     {categories.slice(0, 4).map((c) => (
-      <a href={`/boutique?categorie=${c.slug}`} class="flex aspect-[4/3] items-end justify-center bg-sauge p-4"><h3 class="h-title text-2xl text-creme">{c.name}</h3></a>))}
+      <a href={`/boutique?categorie=${c.slug}`} class="flex aspect-[4/3] items-end justify-center bg-sauge p-4"><h3 class="h-title text-center text-lg text-creme min-[360px]:text-2xl">{c.name}</h3></a>))}
   </section>
 
   <!-- RÉASSURANCE -->

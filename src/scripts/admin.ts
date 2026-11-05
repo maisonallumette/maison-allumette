@@ -2,6 +2,7 @@
 // Les changements restent dans un brouillon (IndexedDB) ; « Publier » les envoie en UN SEUL commit sur GitHub,
 // donc une seule publication Netlify, car ces publications sont comptées.
 // La connexion et l'écriture sur GitHub passent par les fonctions de netlify/functions : le navigateur ne voit aucun secret.
+import { CADRAGE_DEFAUT, ZOOM_MAX, styleCadrage, type Cadrage } from '../data/cadrage';
 
 const API = '/api/admin';
 const RAW = 'https://raw.githubusercontent.com/maisonallumette/maison-allumette/main/public';
@@ -10,7 +11,7 @@ const PHOTO_MAX = 1600;
 
 type Sub = { slug: string; name: string };
 type Category = { slug: string; name: string; subcategories: Sub[] };
-type Product = { slug: string; name: string; category: string; subcategory: string; price: number; short: string; description: string; notes: string[]; conseils: string; composition: string; image: string };
+type Product = { slug: string; name: string; category: string; subcategory: string; price: number; short: string; description: string; notes: string[]; conseils: string; composition: string; image: string; cadrage?: Cadrage };
 type Catalogue = { categories: Category[]; products: Product[] };
 // files : chemin dans public/ -> contenu base64 à envoyer, ou null pour supprimer le fichier
 type Draft = { catalogue: Catalogue; files: Record<string, string | null>; baseSha: string; log: string[] };
@@ -182,6 +183,73 @@ function apercu(p: Product) {
   return attente ? `data:image/jpeg;base64,${attente}` : RAW + p.image;
 }
 
+const borner = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+
+// Petite photo de la liste, avec le cadrage du produit
+function vignette(p: Product) {
+  return h('div', { class: 'relative size-14 flex-none overflow-hidden bg-lin' },
+    h('img', { src: apercu(p), alt: '', loading: 'lazy', style: styleCadrage(p.cadrage ?? CADRAGE_DEFAUT), class: 'absolute inset-0 size-full object-cover' }));
+}
+
+// Choix du cadrage : on fait glisser la photo dans le carré, le curseur règle le zoom
+function outilCadrage(depart: Cadrage) {
+  let cadrage = { ...depart };
+  const image = h('img', { alt: 'Aperçu de la photo dans son cadre carré', class: 'pointer-events-none absolute inset-0 size-full select-none object-cover' });
+  const zoom = h('input', { id: 'p-zoom', type: 'range', min: '1', max: String(ZOOM_MAX), step: '0.01', class: 'mt-1 block w-full accent-olive' });
+  const appliquer = () => {
+    image.style.cssText = styleCadrage(cadrage);
+    zoom.value = String(cadrage.zoom);
+  };
+  // Décalage en pixels -> position en % : tout dépend de ce qui dépasse du carré sur cet axe
+  const deplacer = (dx: number, dy: number) => {
+    const cote = cadre.clientWidth;
+    const petit = Math.min(image.naturalWidth, image.naturalHeight);
+    if (!cote || !petit) return;
+    const depasse = (dim: number) => (dim / petit) * cote * cadrage.zoom - cote;
+    const position = (p: number, d: number, dim: number) => (depasse(dim) > 0.5 ? borner(p - (d / depasse(dim)) * 100, 0, 100) : p);
+    cadrage.x = Math.round(position(cadrage.x, dx, image.naturalWidth) * 10) / 10;
+    cadrage.y = Math.round(position(cadrage.y, dy, image.naturalHeight) * 10) / 10;
+    appliquer();
+  };
+  let precedent: { x: number; y: number } | null = null;
+  const cadre = h('div', {
+    tabindex: '0', role: 'group', 'aria-label': 'Cadrage de la photo : faites glisser la photo, ou utilisez les flèches du clavier',
+    class: 'relative mt-2 aspect-square w-full max-w-xs cursor-grab touch-none select-none overflow-hidden border border-olive bg-lin active:cursor-grabbing',
+    onpointerdown: (e: PointerEvent) => { cadre.setPointerCapture(e.pointerId); precedent = { x: e.clientX, y: e.clientY }; },
+    onpointermove: (e: PointerEvent) => {
+      if (!precedent) return;
+      const avant = precedent; precedent = { x: e.clientX, y: e.clientY };
+      deplacer(e.clientX - avant.x, e.clientY - avant.y);
+    },
+    onpointerup: () => { precedent = null; },
+    onpointercancel: () => { precedent = null; },
+    onkeydown: (e: KeyboardEvent) => {
+      const sens: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      const s = sens[e.key];
+      if (!s) return;
+      e.preventDefault();
+      deplacer(s[0] * 8, s[1] * 8);
+    },
+  }, image,
+    // Sur téléphone, le bouton des listes couvre environ un cinquième de la photo
+    h('p', { class: 'pointer-events-none absolute inset-x-0 bottom-0 flex h-1/5 items-center justify-center bg-creme/80 text-center text-[10px] uppercase tracking-wider' }, 'Zone du bouton « Ajouter au panier »'));
+  zoom.addEventListener('input', () => { cadrage.zoom = Number(zoom.value); appliquer(); });
+  const recentrer = h('button', { type: 'button', class: `${cn.btn} mt-2`, onclick: () => { cadrage = { ...CADRAGE_DEFAUT }; appliquer(); } }, 'Recentrer');
+  const bloc = h('div', { class: 'mt-3' },
+    h('p', { class: 'text-xs/5' }, 'Faites glisser la photo pour choisir ce qui apparaît dans le carré.'),
+    cadre,
+    h('label', { for: 'p-zoom', class: cn.label }, 'Zoom'), zoom,
+    recentrer);
+  appliquer();
+  return {
+    bloc,
+    valeur: () => ({ ...cadrage }),
+    // Une nouvelle photo repart d'un cadrage centré ; sans photo, il n'y a rien à cadrer
+    montrer: (src: string, neuf: Cadrage) => { cadrage = { ...neuf }; image.src = src; bloc.hidden = false; appliquer(); },
+    cacher: () => { image.removeAttribute('src'); bloc.hidden = true; },
+  };
+}
+
 // Une photo déjà en ligne doit être supprimée du dépôt ; une photo jamais publiée sort juste du brouillon
 function oublierPhoto(chemin: string, d: Draft) {
   if (!chemin.startsWith(DOSSIER_PHOTOS)) return;
@@ -277,7 +345,7 @@ function ecranListe() {
     h('button', { type: 'button', class: `${cn.btnPlein} w-full`, onclick: () => { edition = 'nouveau'; message = null; afficher(); window.scrollTo(0, 0); } }, 'Nouveau produit'),
     c.products.length === 0 && h('p', { class: 'mt-6 text-sm' }, 'Aucun produit pour le moment.'),
     h('ul', { class: 'mt-4 divide-y divide-lin' }, ...c.products.map((p) => h('li', { class: 'flex items-center gap-3 py-3' },
-      h('img', { src: apercu(p), alt: '', loading: 'lazy', class: 'size-14 flex-none bg-lin object-cover' }),
+      vignette(p),
       h('div', { class: 'min-w-0 flex-1' },
         h('p', { class: 'truncate text-sm font-semibold' }, p.name),
         h('p', { class: 'truncate text-xs' }, [nomCat(p.category), nomSub(p)].filter(Boolean).join(' › '), ' · ', eur(p.price))),
@@ -312,13 +380,15 @@ function ecranProduit(slug: string) {
   const notes = texte('p-notes', (existant?.notes ?? []).join('\n'));
   const conseils = texte('p-conseils', existant?.conseils ?? '');
   const compo = texte('p-compo', existant?.composition ?? '');
-  const image = h('img', { alt: 'Aperçu de la photo', class: 'mt-2 size-32 bg-lin object-cover', src: existant ? apercu(existant) : '/placeholder.svg' });
+  const outil = outilCadrage(existant?.cadrage ?? CADRAGE_DEFAUT);
+  if (existant?.image) outil.montrer(apercu(existant), existant.cadrage ?? CADRAGE_DEFAUT);
+  else outil.cacher();
   const fichier = h('input', { id: 'p-photo', type: 'file', accept: 'image/*', class: 'mt-1 block w-full text-sm', onchange: async () => {
     const f = fichier.files?.[0];
     if (!f) return;
     try {
       photo = await preparerPhoto(f); retirerPhoto = false;
-      image.src = `data:image/jpeg;base64,${photo}`;
+      outil.montrer(`data:image/jpeg;base64,${photo}`, CADRAGE_DEFAUT);
     } catch (e) { fichier.value = ''; alert((e as Error).message); }
   } });
 
@@ -331,7 +401,7 @@ function ecranProduit(slug: string) {
     if (!slugNeuf) { alert('Le nom doit contenir au moins une lettre ou un chiffre.'); nom.focus(); return; }
     const chemin = `${DOSSIER_PHOTOS}${slugNeuf}.jpg`;
     const donnees: Product = {
-      slug: slugNeuf, name: nomV, category: cat.value, subcategory: sub.value, price: Math.round(prixNb * 100) / 100, image: photo ? chemin : retirerPhoto ? '' : existant?.image ?? '',
+      slug: slugNeuf, name: nomV, category: cat.value, subcategory: sub.value, price: Math.round(prixNb * 100) / 100, image: photo ? chemin : retirerPhoto ? '' : existant?.image ?? '', cadrage: outil.valeur(),
       short: court.value.trim(), description: desc.value.trim(), notes: notes.value.split('\n').map((l) => l.trim()).filter(Boolean), conseils: conseils.value.trim(), composition: compo.value.trim(),
     };
     modifier(`${existant ? 'Produit modifié' : 'Produit ajouté'} : ${nomV}`, (cat2, d) => {
@@ -364,8 +434,8 @@ function ecranProduit(slug: string) {
     champ('p-notes', 'Points clés (un par ligne)', notes),
     champ('p-conseils', 'Conseils d’utilisation', conseils),
     champ('p-compo', 'Composition', compo),
-    h('div', {}, h('label', { for: 'p-photo', class: cn.label }, 'Photo'), fichier, image,
-      existant?.image && h('button', { type: 'button', class: `${cn.btn} mt-2 block`, onclick: () => { retirerPhoto = true; photo = null; fichier.value = ''; image.src = '/placeholder.svg'; } }, 'Retirer la photo')),
+    h('div', {}, h('label', { for: 'p-photo', class: cn.label }, 'Photo'), fichier, outil.bloc,
+      existant?.image && h('button', { type: 'button', class: `${cn.btn} mt-2 block`, onclick: () => { retirerPhoto = true; photo = null; fichier.value = ''; outil.cacher(); } }, 'Retirer la photo')),
     h('div', { class: 'mt-6 flex flex-wrap gap-2' },
       h('button', { class: cn.btnPlein }, 'Enregistrer'),
       h('button', { type: 'button', class: cn.btn, onclick: () => { edition = null; afficher(); } }, 'Annuler'),

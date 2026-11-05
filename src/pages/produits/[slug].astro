@@ -1,12 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PhotoCadree from '../../components/PhotoCadree.astro';
 import { products, eur } from '../../data/products';
 export function getStaticPaths() { return products.map((p) => ({ params: { slug: p.slug }, props: { p } })); }
 const { p } = Astro.props;
 ---
 <Base title={`${p.name} | Maison Allumette`} description={p.short}>
   <article class="md:mx-auto md:grid md:max-w-6xl md:grid-cols-2 md:gap-10 md:px-4">
-    <img src={p.image} alt={p.name} class="aspect-square w-full object-cover" />
+    <div class="self-start"><PhotoCadree p={p} /></div>
     <div class="bg-creme p-5 md:bg-transparent md:p-0">
       <div class="flex justify-between gap-4"><h1 class="h-title text-3xl leading-tight">{p.name}</h1><p class="text-lg font-semibold">{eur(p.price)}</p></div>
       <p class="mt-2 font-serif italic">{p.short}</p>

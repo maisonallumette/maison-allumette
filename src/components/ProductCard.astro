@@ -1,10 +1,11 @@
 ---
 import { eur, categoryName, subcategoryName } from '../data/products';
+import PhotoCadree from './PhotoCadree.astro';
 const { p } = Astro.props;
 ---
 <article class="flex flex-col" data-cat={p.category} data-sub={p.subcategory} data-search={`${p.name} ${categoryName(p.category)} ${subcategoryName(p.category, p.subcategory)}`.toLowerCase()}>
-  <div class="relative aspect-square bg-creme">
-    <a href={`/produits/${p.slug}`}><img src={p.image} alt={p.name} loading="lazy" class="size-full object-cover" /></a>
+  <div class="relative">
+    <a href={`/produits/${p.slug}`} class="block"><PhotoCadree p={p} loading="lazy" /></a>
     <button data-add data-id={p.slug} data-name={p.name} data-price={p.price}
       class="absolute inset-x-0 bottom-0 border border-olive bg-creme py-2 text-xs font-medium uppercase tracking-wider transition hover:bg-olive hover:text-creme">Ajouter au panier</button>
   </div>

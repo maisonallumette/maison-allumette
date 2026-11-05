@@ -12,7 +12,7 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 - `src/styles/global.css` : thème provisoire (couleurs, polices), `.h-title`, `.vichy` (motif vichy), `.papier-peint` (larges bandes beiges sur crème), comportement de l'en-tête.
 - `src/layouts/Base.astro` : en-tête (transparent en haut, bandeau blanc après 90 px de défilement), tiroir mobile, newsletter, pied de page, panier en localStorage.
 - `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit, barre d'achat fixe).
-- `src/components/ProductCard.astro`, `Seal.astro` (sceau officiel, crème et orange).
+- `src/components/ProductCard.astro`, `Seal.astro` (sceau officiel, crème et orange), `PhotoCadree.astro` (photo carrée avec le cadrage choisi dans l'admin : champ `cadrage` du produit, voir `src/data/cadrage.ts`).
 - `src/data/catalogue.json` : catégories, sous-catégories et produits (descriptions d'exemple à remplacer). Lu par `src/data/products.ts`, modifié depuis `/admin/`.
 - `src/pages/admin/index.astro` + `src/scripts/admin.ts` : page admin avec identifiant et mot de passe. Brouillon dans le navigateur, puis un seul commit sur `main`.
 - `netlify/functions/` et `netlify/lib/acces.mjs` : connexion, session et écriture sur GitHub côté serveur. Variables Netlify : `ADMIN_IDENTIFIANT`, `ADMIN_MOT_DE_PASSE_EMPREINTE`, `ADMIN_SESSION_SECRET`, `ADMIN_GITHUB_JETON`. `npm run admin:acces` génère les trois premières (aussi pour changer le mot de passe, puis redéployer).
