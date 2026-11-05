@@ -34,3 +34,8 @@ header.site.is-scrolled { background: #fff; border-bottom-color: var(--color-lin
 header.site .logo-wrap { transition: transform .3s; transform-origin: center top; }
 header.site:not(.is-scrolled) .logo-wrap { transform: scale(1.1); }
 @media (min-width: 48rem) { header.site:not(.is-scrolled) .logo-wrap { transform: scale(1.35); } }
+
+/* Panneau du menu et voile flou : fondu à l'ouverture. Visible tout de suite (pour recevoir le curseur), caché seulement à la fin du fondu de fermeture */
+.fondu { opacity: 0; visibility: hidden; transition: opacity .5s ease-out, visibility 0s linear .5s; }
+.fondu.est-ouvert { opacity: 1; visibility: visible; transition: opacity .5s ease-out, visibility 0s; }
+@media (prefers-reduced-motion: reduce) { .fondu, .fondu.est-ouvert { transition: none; } }
