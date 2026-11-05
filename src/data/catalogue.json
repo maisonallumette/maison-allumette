@@ -47,15 +47,15 @@
   "products": [
     {
       "slug": "bougie-fleurie",
-      "name": "Bougie fleurie",
+      "name": "Bougie tasse chinée",
       "category": "bougies",
       "subcategory": "bougies-decoratives",
       "price": 29,
       "image": "/images/produits/bougie-fleurie.jpg",
       "cadrage": {
-        "x": 50,
-        "y": 50,
-        "zoom": 1
+        "x": 94,
+        "y": 0,
+        "zoom": 1.02
       },
       "short": "Cire végétale et fleurs séchées des Landes.",
       "description": "Une bougie coulée à la main, parée de fleurs séchées locales et de paillettes biodégradables. Elle parfume la pièce en douceur et se garde ensuite comme un joli objet.",
@@ -73,19 +73,18 @@
       "name": "Suspension parfumée",
       "category": "suspensions",
       "subcategory": "",
-      "price": 9,
+      "price": 10,
       "image": "/images/produits/suspension-parfumee.jpg",
       "cadrage": {
         "x": 50,
-        "y": 14.8,
+        "y": 50,
         "zoom": 1
       },
       "short": "À glisser dans un placard ou un tiroir.",
       "description": "Une suspension parfumée pour les armoires, les dressings et les petits recoins de la maison.",
       "notes": [
         "Format 50 g",
-        "Fragrance de Grasse",
-        "Cornet kraft"
+        "Fragrance de Grasse"
       ],
       "conseils": "",
       "composition": ""
@@ -95,12 +94,12 @@
       "name": "Diffuseur voiture",
       "category": "voiture",
       "subcategory": "",
-      "price": 12,
+      "price": 10.9,
       "image": "/images/produits/diffuseur-voiture.jpg",
       "cadrage": {
-        "x": 50,
-        "y": 50,
-        "zoom": 1
+        "x": 45.3,
+        "y": 27.9,
+        "zoom": 1.64
       },
       "short": "Un parfum doux pour chaque trajet.",
       "description": "Un diffuseur à accrocher au rétroviseur ou à glisser dans l’habitacle, pour des trajets qui sentent bon.",
@@ -117,7 +116,7 @@
       "name": "Tablettes parfumées",
       "category": "tablettes",
       "subcategory": "",
-      "price": 8,
+      "price": 6.9,
       "image": "/images/produits/tablettes-parfumees.jpg",
       "cadrage": {
         "x": 50,
@@ -136,7 +135,7 @@
     },
     {
       "slug": "bruleur-botte-cow-girl",
-      "name": "Bruleur botte cow girl",
+      "name": "Brûleur botte cow girl",
       "category": "bruleurs",
       "subcategory": "",
       "price": 16.9,
@@ -166,6 +165,78 @@
       },
       "short": "Bouquet éternel Fleur de Tiaré - Un souvenir qui ne fane jamais.",
       "description": "Composition de fleurs de cire d'olive parfumée et de fleurs séchées et stabilisées. Chaque bouquet est unique, il ne demande pas d'entretien, simplement un endroit où rayonner.\n\nLes volumes, les teintes et les variétés peuvent légèrement varier selon les saisons et les sélections, ce qui en fait une création authentique, vivante et singulière.\n\nOffrir un bouquet éternel Home M.ade, c'est s'offrir :\n\nune attention durable\nune émotion délicate\nun objet décoratif intemporel\nFleur de Tiaré : cette fragrance vous transporte instantanément vers des îles paradisiaques. Un coeur floral exquis et envoûtant.\n\nLes teintes beiges et vertes avec un soupçon de doré se fondront parfaitement dans votre intérieur.\n\nGrand bouquet : environ 600g de cire\n\nPetit bouquet : environ 200g de cire",
+      "notes": [],
+      "conseils": "",
+      "composition": ""
+    },
+    {
+      "slug": "bougie-pot-de-resinier",
+      "name": "Bougie Pot de résinier",
+      "category": "bougies",
+      "subcategory": "bougies-decoratives",
+      "price": 49,
+      "image": "/images/produits/bougie-pot-de-resinier.jpg",
+      "cadrage": {
+        "x": 69.2,
+        "y": 91.3,
+        "zoom": 1.22
+      },
+      "short": "",
+      "description": "",
+      "notes": [],
+      "conseils": "",
+      "composition": ""
+    },
+    {
+      "slug": "bougie-leopard",
+      "name": "Bougie léopard",
+      "category": "bougies",
+      "subcategory": "bougies-a-allumer",
+      "price": 36,
+      "image": "/images/produits/bougie-leopard.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
+      "short": "",
+      "description": "",
+      "notes": [],
+      "conseils": "",
+      "composition": ""
+    },
+    {
+      "slug": "bougie-metal-dore",
+      "name": "Bougie métal doré",
+      "category": "bougies",
+      "subcategory": "bougies-a-allumer",
+      "price": 16,
+      "image": "/images/produits/bougie-metal-dore.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
+      "short": "",
+      "description": "",
+      "notes": [],
+      "conseils": "",
+      "composition": ""
+    },
+    {
+      "slug": "pigne-de-pin",
+      "name": "Pigne de pin",
+      "category": "bougies",
+      "subcategory": "bougies-decoratives",
+      "price": 10,
+      "image": "/images/produits/pigne-de-pin.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
+      "short": "",
+      "description": "",
       "notes": [],
       "conseils": "",
       "composition": ""
