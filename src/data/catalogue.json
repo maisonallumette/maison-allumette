@@ -52,6 +52,11 @@
       "subcategory": "bougies-decoratives",
       "price": 29,
       "image": "/images/produits/bougie-fleurie.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
       "short": "Cire végétale et fleurs séchées des Landes.",
       "description": "Une bougie coulée à la main, parée de fleurs séchées locales et de paillettes biodégradables. Elle parfume la pièce en douceur et se garde ensuite comme un joli objet.",
       "notes": [
@@ -70,6 +75,11 @@
       "subcategory": "",
       "price": 9,
       "image": "/images/produits/suspension-parfumee.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 14.8,
+        "zoom": 1
+      },
       "short": "À glisser dans un placard ou un tiroir.",
       "description": "Une suspension parfumée pour les armoires, les dressings et les petits recoins de la maison.",
       "notes": [
@@ -87,6 +97,11 @@
       "subcategory": "",
       "price": 12,
       "image": "/images/produits/diffuseur-voiture.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
       "short": "Un parfum doux pour chaque trajet.",
       "description": "Un diffuseur à accrocher au rétroviseur ou à glisser dans l’habitacle, pour des trajets qui sentent bon.",
       "notes": [
@@ -104,6 +119,11 @@
       "subcategory": "",
       "price": 8,
       "image": "/images/produits/tablettes-parfumees.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
       "short": "De petites attentions à offrir.",
       "description": "Des tablettes parfumées en cire végétale, à poser dans un meuble ou à offrir en petit cadeau.",
       "notes": [
@@ -121,6 +141,11 @@
       "subcategory": "",
       "price": 16.9,
       "image": "/images/produits/bruleur-botte-cow-girl.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
       "short": "",
       "description": "Éveillez vos sens avec ce brûleur d'huiles essentielles et chauffe-cire en forme de botte de cowboy rose, idéal pour diffuser de douces senteurs dans votre intérieur ! Parfait pour toutes les passionnées de cowboy, cet objet déco unique allie tendance et fonctionnalité. Compatible avec les huiles parfumées diluées et les fondants parfumés.\n. Taille du produit : 13,5 cm x 14,5 cm x 7 cm\n. Poids du produit : 305 g",
       "notes": [],
@@ -134,6 +159,11 @@
       "subcategory": "",
       "price": 59,
       "image": "/images/produits/bouquet-fleur-de-tiare.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
       "short": "Bouquet éternel Fleur de Tiaré - Un souvenir qui ne fane jamais.",
       "description": "Composition de fleurs de cire d'olive parfumée et de fleurs séchées et stabilisées. Chaque bouquet est unique, il ne demande pas d'entretien, simplement un endroit où rayonner.\n\nLes volumes, les teintes et les variétés peuvent légèrement varier selon les saisons et les sélections, ce qui en fait une création authentique, vivante et singulière.\n\nOffrir un bouquet éternel Home M.ade, c'est s'offrir :\n\nune attention durable\nune émotion délicate\nun objet décoratif intemporel\nFleur de Tiaré : cette fragrance vous transporte instantanément vers des îles paradisiaques. Un coeur floral exquis et envoûtant.\n\nLes teintes beiges et vertes avec un soupçon de doré se fondront parfaitement dans votre intérieur.\n\nGrand bouquet : environ 600g de cire\n\nPetit bouquet : environ 200g de cire",
       "notes": [],
