@@ -13,7 +13,8 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 - `src/layouts/Base.astro` : en-tête (transparent en haut, bandeau blanc après 90 px de défilement), tiroir mobile, newsletter, pied de page, panier en localStorage.
 - `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit, barre d'achat fixe).
 - `src/components/ProductCard.astro`, `Seal.astro` (sceau officiel, crème et orange).
-- `src/data/products.ts` : produits (noms, prix, descriptions d'exemple à remplacer).
+- `src/data/catalogue.json` : catégories, sous-catégories et produits (descriptions d'exemple à remplacer). Lu par `src/data/products.ts`, modifié depuis `/admin/`.
+- `src/pages/admin/index.astro` + `src/scripts/admin.ts` : page admin sans serveur. Brouillon dans le navigateur, puis un seul commit sur `main` via l'API GitHub avec un jeton personnel que l'utilisateur colle (jamais dans le code).
 
 ## Direction artistique
 - Inspiration de structure : fragonard.com (en-tête 3 zones, bandeau d'accueil coupé en deux, grille produits, fiche produit mobile avec barre d'achat fixe). Ne jamais copier leurs textes, images, logo ni code.
@@ -34,6 +35,8 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 - Newsletter : brancher un service d'e-mailing.
 
 ## Règles
+- Toujours faire `git pull` avant de travailler : la page admin publie directement sur `main`.
+- Chaque push sur `main` déclenche une publication Netlify, comptée en crédits : regrouper les modifications.
 - Mobile first. Textes en français. Pas d'avis clients inventés.
 - Le domaine maisonallumette.fr pointe aujourd'hui vers la boutique SumUp (DNS OVH) : ne pas toucher au DNS sans demander.
 - Ne jamais écrire de mots de passe ni de clés dans le code.

@@ -1,7 +1,9 @@
 ---
 import '../styles/global.css';
+import { categories } from '../data/products';
 const { overlay = false, title = 'Maison Allumette | Réchauffez vos intérieurs', description = 'Bougies fleuries, fondants, suspensions, diffuseurs voiture et tablettes parfumées, faits main dans les Landes.' } = Astro.props;
-const nav = [['Bougies','bougies'],['Fondants','fondants'],['Suspensions','suspensions'],['Voiture','voiture'],['Tablettes','tablettes']];
+// Au-delà de 5 catégories, le menu ordinateur renvoie vers la boutique pour ne pas passer sous le logo
+const navOrdi = categories.slice(0, 5);
 ---
 <!doctype html>
 <html lang="fr">
@@ -18,7 +20,7 @@ const nav = [['Bougies','bougies'],['Fondants','fondants'],['Suspensions','suspe
     <div class="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-4 py-3">
       <div class="flex items-center gap-4">
         <button data-menu aria-label="Menu" class="xl:hidden"><span class="block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span></button>
-        <nav class="hidden gap-6 text-xs font-semibold uppercase tracking-wider xl:flex">{nav.map(([l,q]) => <a href={`/boutique?q=${q}`}>{l}</a>)}</nav>
+        <nav class="hidden gap-6 text-xs font-semibold uppercase tracking-wider xl:flex">{navOrdi.map((c) => <a href={`/boutique?categorie=${c.slug}`}>{c.name}</a>)}{categories.length > 5 && <a href="/boutique">Tout voir</a>}</nav>
       </div>
       <!-- LOGO provisoire en texte : à remplacer par le SVG du designer -->
       <a href="/" class="logo-wrap text-center leading-none">
@@ -47,7 +49,7 @@ const nav = [['Bougies','bougies'],['Fondants','fondants'],['Suspensions','suspe
     <button data-menu aria-label="Fermer" class="absolute right-3 top-3 text-2xl">×</button>
     <form action="/boutique" class="p-5 pt-12"><input name="q" type="search" placeholder="BOUGIE, FONDANT…" class="w-full bg-creme px-4 py-3 text-sm" /></form>
     <ul class="px-5 text-sm font-semibold uppercase">
-      {nav.map(([l,q]) => <li class="border-b border-lin py-3"><a href={`/boutique?q=${q}`} class="flex justify-between">{l}<span>›</span></a></li>)}
+      {categories.map((c) => <li class="border-b border-lin py-3"><a href={`/boutique?categorie=${c.slug}`} class="flex justify-between">{c.name}<span>›</span></a>{c.subcategories.length > 0 && <ul class="mt-2 space-y-2 pl-3 font-normal normal-case">{c.subcategories.map((s) => <li><a href={`/boutique?categorie=${c.slug}&sous=${s.slug}`}>{s.name}</a></li>)}</ul>}</li>)}
       <li class="py-3"><a href="/histoire">Notre histoire</a></li><li class="py-3"><a href="/contact">Contact</a></li>
     </ul>
     <div class="vichy m-5 p-5"><p class="h-title">Offrir Maison Allumette</p><p class="mt-1 font-serif text-sm italic">Une bougie faite main, c'est le cadeau qui réchauffe.</p></div>

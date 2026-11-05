@@ -11,10 +11,10 @@ const { p } = Astro.props;
       <div class="flex justify-between gap-4"><h1 class="h-title text-3xl leading-tight">{p.name}</h1><p class="text-lg font-semibold">{eur(p.price)}</p></div>
       <p class="mt-2 font-serif italic">{p.short}</p>
       <details open class="mt-6 border-t border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Description</summary>
-        <p class="mt-3 text-sm/6">{p.description}</p><ul class="mt-3 space-y-1 text-sm">{p.notes.map((n) => <li>· {n}</li>)}</ul></details>
-      <!-- À COMPLÉTER : conseils d'utilisation, composition, numéro de lot -->
-      <details class="border-t border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Conseils d'utilisation</summary><p class="mt-3 text-sm/6">À compléter.</p></details>
-      <details class="border-y border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Composition</summary><p class="mt-3 text-sm/6">À compléter.</p></details>
+        <p class="mt-3 whitespace-pre-line text-sm/6">{p.description}</p><ul class="mt-3 space-y-1 text-sm">{p.notes.map((n) => <li>· {n}</li>)}</ul></details>
+      {p.conseils && <details class="border-t border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Conseils d'utilisation</summary><p class="mt-3 whitespace-pre-line text-sm/6">{p.conseils}</p></details>}
+      {p.composition && <details class="border-t border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Composition</summary><p class="mt-3 whitespace-pre-line text-sm/6">{p.composition}</p></details>}
+      <div class="border-t border-lin"></div>
     </div>
   </article>
   <!-- BARRE D'ACHAT FIXE EN BAS -->

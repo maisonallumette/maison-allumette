@@ -1,8 +1,8 @@
 ---
-import { eur } from '../data/products';
+import { eur, categoryName, subcategoryName } from '../data/products';
 const { p } = Astro.props;
 ---
-<article class="flex flex-col" data-search={`${p.name} ${p.category}`.toLowerCase()}>
+<article class="flex flex-col" data-cat={p.category} data-sub={p.subcategory} data-search={`${p.name} ${categoryName(p.category)} ${subcategoryName(p.category, p.subcategory)}`.toLowerCase()}>
   <div class="relative aspect-square bg-creme">
     <a href={`/produits/${p.slug}`}><img src={p.image} alt={p.name} loading="lazy" class="size-full object-cover" /></a>
     <button data-add data-id={p.slug} data-name={p.name} data-price={p.price}

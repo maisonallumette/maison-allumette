@@ -1,0 +1,46 @@
+{
+  "categories": [
+    { "slug": "bougies", "name": "Bougies", "subcategories": [] },
+    { "slug": "fondants", "name": "Fondants", "subcategories": [] },
+    { "slug": "suspensions", "name": "Suspensions", "subcategories": [] },
+    { "slug": "voiture", "name": "Voiture", "subcategories": [] },
+    { "slug": "tablettes", "name": "Tablettes", "subcategories": [] }
+  ],
+  "products": [
+    {
+      "slug": "bougie-fleurie", "name": "Bougie fleurie", "category": "bougies", "subcategory": "", "price": 18, "image": "",
+      "short": "Cire végétale et fleurs séchées des Landes.",
+      "description": "Une bougie coulée à la main, parée de fleurs séchées locales et de paillettes biodégradables. Elle parfume la pièce en douceur et se garde ensuite comme un joli objet.",
+      "notes": ["Cire végétale", "Fragrance de Grasse", "Fleurs séchées locales", "Fait main dans les Landes"],
+      "conseils": "", "composition": ""
+    },
+    {
+      "slug": "fondants-parfumes", "name": "Fondants parfumés", "category": "fondants", "subcategory": "", "price": 7, "image": "",
+      "short": "Pour parfumer la maison sans flamme.",
+      "description": "Des fondants à faire fondre dans un brûle-parfum, pour une odeur généreuse sans flamme.",
+      "notes": ["Sans flamme", "Fragrance de Grasse", "Fait main dans les Landes"],
+      "conseils": "", "composition": ""
+    },
+    {
+      "slug": "suspension-parfumee", "name": "Suspension parfumée", "category": "suspensions", "subcategory": "", "price": 9, "image": "",
+      "short": "À glisser dans un placard ou un tiroir.",
+      "description": "Une suspension parfumée pour les armoires, les dressings et les petits recoins de la maison.",
+      "notes": ["Format 50 g", "Fragrance de Grasse", "Cornet kraft"],
+      "conseils": "", "composition": ""
+    },
+    {
+      "slug": "diffuseur-voiture", "name": "Diffuseur voiture", "category": "voiture", "subcategory": "", "price": 12, "image": "",
+      "short": "Un parfum doux pour chaque trajet.",
+      "description": "Un diffuseur à accrocher au rétroviseur ou à glisser dans l’habitacle, pour des trajets qui sentent bon.",
+      "notes": ["14 ml", "Fragrance de Grasse", "Fait main dans les Landes"],
+      "conseils": "", "composition": ""
+    },
+    {
+      "slug": "tablettes-parfumees", "name": "Tablettes parfumées", "category": "tablettes", "subcategory": "", "price": 8, "image": "",
+      "short": "De petites attentions à offrir.",
+      "description": "Des tablettes parfumées en cire végétale, à poser dans un meuble ou à offrir en petit cadeau.",
+      "notes": ["Cire végétale", "Idée cadeau", "Fait main dans les Landes"],
+      "conseils": "", "composition": ""
+    }
+  ]
+}

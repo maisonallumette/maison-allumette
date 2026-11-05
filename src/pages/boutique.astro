@@ -1,25 +1,47 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProductCard from '../components/ProductCard.astro';
-import { products } from '../data/products';
+import { products, categories } from '../data/products';
+const pastille = 'border border-olive bg-creme px-3 py-2 aria-[current=page]:bg-olive aria-[current=page]:text-creme';
 ---
 <Base title="Boutique | Maison Allumette">
   <section class="mx-auto max-w-6xl px-4 pt-12">
-    <h1 class="font-serif text-5xl">La boutique</h1>
+    <h1 data-titre class="font-serif text-5xl">La boutique</h1>
+    <!-- Sous-catégories de la catégorie affichée -->
+    {categories.filter((c) => c.subcategories.length > 0).map((c) => (
+      <nav data-sous-nav={c.slug} data-nom={c.name} hidden aria-label={`Sous-catégories : ${c.name}`} class="mt-6 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wider">
+        <a href={`/boutique?categorie=${c.slug}`} class={pastille}>Tout</a>
+        {c.subcategories.map((s) => <a data-sous={s.slug} href={`/boutique?categorie=${c.slug}&sous=${s.slug}`} class={pastille}>{s.name}</a>)}
+      </nav>
+    ))}
     <p data-empty hidden class="mt-6 text-sm">Aucun produit ne correspond à votre recherche.</p>
-    <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+    <div data-noms={JSON.stringify(Object.fromEntries(categories.map((c) => [c.slug, c.name])))} class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
       {products.map((p) => <ProductCard p={p} />)}
     </div>
   </section>
-  <!-- Filtre la grille avec ?q= (barre de recherche du header) -->
+  <!-- Filtre la grille : ?categorie=, ?sous= et ?q= (recherche) -->
   <script>
-    const q = (new URLSearchParams(location.search).get('q') || '').toLowerCase().trim();
-    if (q) {
+    const params = new URLSearchParams(location.search);
+    const q = (params.get('q') || '').toLowerCase().trim();
+    const cat = params.get('categorie') || '';
+    const sous = params.get('sous') || '';
+    if (q || cat) {
       let n = 0;
       document.querySelectorAll<HTMLElement>('[data-search]').forEach((el) => {
-        const ok = el.dataset.search!.includes(q); el.hidden = !ok; if (ok) n++;
+        const ok = (!q || el.dataset.search!.includes(q)) && (!cat || el.dataset.cat === cat) && (!sous || el.dataset.sub === sous);
+        el.hidden = !ok; if (ok) n++;
       });
       document.querySelector<HTMLElement>('[data-empty]')!.hidden = n > 0;
+    }
+    if (cat) {
+      const noms = JSON.parse(document.querySelector<HTMLElement>('[data-noms]')!.dataset.noms || '{}');
+      if (noms[cat]) document.querySelector('[data-titre]')!.textContent = noms[cat];
+      const nav = [...document.querySelectorAll<HTMLElement>('[data-sous-nav]')].find((e) => e.dataset.sousNav === cat);
+      if (nav) {
+        nav.hidden = false;
+        const actif = sous ? [...nav.querySelectorAll<HTMLElement>('[data-sous]')].find((a) => a.dataset.sous === sous) : nav.querySelector('a');
+        actif?.setAttribute('aria-current', 'page');
+      }
     }
   </script>
 </Base>
