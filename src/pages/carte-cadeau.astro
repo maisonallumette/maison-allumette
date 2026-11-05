@@ -2,6 +2,7 @@
 // Carte cadeau envoyée par la poste avec un petit mot écrit à la main.
 // À BRANCHER avec le paiement : création du code, suivi du solde, utilisation en une ou plusieurs fois.
 import Base from '../layouts/Base.astro';
+import CarteCadeau from '../components/CarteCadeau.astro';
 const MIN = 15, MAX = 200; // montants acceptés, à ajuster
 const MONTANTS = [20, 30, 50, 80];
 const MOT_MAX = 200;
@@ -13,12 +14,7 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
   <section class="md:grid md:min-h-[calc(100svh-5rem)] md:grid-cols-2">
     <!-- La carte, dessinée aux couleurs de la maison -->
     <div class="vichy flex items-center justify-center overflow-hidden px-6 py-14 md:py-20">
-      <div class="relative flex aspect-[1.586] w-full max-w-md -rotate-2 items-center justify-center rounded-2xl bg-olive p-6 text-creme shadow-2xl">
-        <span role="img" aria-label="Maison Allumette, Réchauffez vos intérieurs" class="logo-ovale w-[34%]"></span>
-        <span class="absolute bottom-4 left-5 font-serif text-sm italic text-lin">Carte cadeau</span>
-        <span class="absolute right-5 top-4 text-[10px] font-semibold uppercase tracking-[.3em] text-or">Offrir</span>
-        <img src="/brand/ma-pastille-orange.jpg" alt="" class="absolute -bottom-6 -right-4 w-20 rotate-6 rounded-full shadow-lg md:w-24" />
-      </div>
+      <CarteCadeau class="max-w-md" />
     </div>
 
     <div class="px-5 py-10 md:px-10 lg:px-16">

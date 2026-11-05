@@ -1,31 +1,71 @@
 ---
+// Fiche produit en trois cadres : bandeau blanc en haut, photo à gauche (fixe pendant le défilement), informations à droite.
+// Sur téléphone : photo, puis informations, et barre d'achat fixée en bas.
 import Base from '../../layouts/Base.astro';
 import PhotoCadree from '../../components/PhotoCadree.astro';
-import { products, eur } from '../../data/products';
+import { products, eur, categoryName, subcategoryName } from '../../data/products';
 export function getStaticPaths() { return products.map((p) => ({ params: { slug: p.slug }, props: { p } })); }
 const { p } = Astro.props;
+const cat = categoryName(p.category);
+const sous = subcategoryName(p.category, p.subcategory);
+const QUANTITES = [1, 2, 3, 4, 5, 6];
+const rubrique = 'group border-b border-lin';
+const titreRubrique = 'flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-xs font-semibold uppercase tracking-wider [&::-webkit-details-marker]:hidden';
+const plus = 'text-lg font-normal leading-none transition-transform group-open:rotate-45';
 ---
-<Base title={`${p.name} | Maison Allumette`} description={p.short}>
-  <article class="md:mx-auto md:grid md:max-w-6xl md:grid-cols-2 md:gap-10 md:px-4">
-    <div class="self-start"><PhotoCadree p={p} /></div>
-    <div class="bg-creme p-5 md:bg-transparent md:p-0">
-      <div class="flex justify-between gap-4"><h1 class="h-title text-3xl leading-tight">{p.name}</h1><p class="text-lg font-semibold">{eur(p.price)}</p></div>
-      <p class="mt-2 font-serif italic">{p.short}</p>
-      <details open class="mt-6 border-t border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Description</summary>
-        <p class="mt-3 whitespace-pre-line text-sm/6">{p.description}</p><ul class="mt-3 space-y-1 text-sm">{p.notes.map((n) => <li>· {n}</li>)}</ul></details>
-      {p.conseils && <details class="border-t border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Conseils d'utilisation</summary><p class="mt-3 whitespace-pre-line text-sm/6">{p.conseils}</p></details>}
-      {p.composition && <details class="border-t border-lin py-3"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Composition</summary><p class="mt-3 whitespace-pre-line text-sm/6">{p.composition}</p></details>}
-      <div class="border-t border-lin"></div>
+<Base title={`${p.name} | Maison Allumette`} description={p.short} bandeau>
+  <article class="md:grid md:grid-cols-2">
+    <!-- CADRE 2 : la photo -->
+    <div class="bg-white md:sticky md:top-20 md:flex md:h-[calc(100svh-5rem)] md:items-center md:justify-center md:p-10">
+      <div class="w-full md:max-w-[min(34rem,calc(100svh-10rem))]"><PhotoCadree p={p} /></div>
+    </div>
+
+    <!-- CADRE 3 : les informations -->
+    <div class="bg-creme px-5 py-8 md:min-h-[calc(100svh-5rem)] md:px-10 md:py-16 lg:px-20">
+      <div class="md:max-w-lg">
+        <nav aria-label="Fil d'Ariane" class="text-[11px] font-semibold uppercase tracking-wider text-encre/70">
+          <a href="/">Accueil</a>
+          {cat && <><span aria-hidden="true" class="mx-1.5">/</span><a href={`/boutique?categorie=${p.category}`}>{cat}</a></>}
+          {sous && <><span aria-hidden="true" class="mx-1.5">/</span><a href={`/boutique?categorie=${p.category}&sous=${p.subcategory}`}>{sous}</a></>}
+        </nav>
+        <div class="mt-5 flex items-start justify-between gap-6">
+          <h1 class="h-title text-3xl leading-tight">{p.name}</h1>
+          <p class="pt-1 text-lg font-semibold whitespace-nowrap">{eur(p.price)}</p>
+        </div>
+        {p.short && <p class="mt-3 font-serif text-lg italic">{p.short}</p>}
+
+        <!-- Achat sur tablette et ordinateur -->
+        <div class="mt-8 hidden md:flex">
+          <select data-qty aria-label="Quantité" class="w-20 border border-r-0 border-terracotta bg-white px-3 text-sm">{QUANTITES.map((n) => <option>{n}</option>)}</select>
+          <button data-add data-useqty data-id={p.slug} data-name={p.name} data-price={p.price} class="flex-1 bg-terracotta py-4 text-xs font-semibold uppercase tracking-wider text-creme transition-colors hover:bg-olive">Ajouter au panier</button>
+        </div>
+
+        {(p.description || p.notes.length > 0) && (
+          <div class="mt-8 border-b border-lin pb-6 md:border-t md:pt-6">
+            {p.description && <p class="whitespace-pre-line text-sm/6">{p.description}</p>}
+            {p.notes.length > 0 && <ul class="mt-4 space-y-1 text-sm">{p.notes.map((n) => <li>· {n}</li>)}</ul>}
+          </div>
+        )}
+        {p.conseils && (
+          <details class={rubrique}><summary class={titreRubrique}>Conseils d'utilisation<span aria-hidden="true" class={plus}>+</span></summary>
+            <p class="whitespace-pre-line pb-5 text-sm/6">{p.conseils}</p></details>
+        )}
+        {p.composition && (
+          <details class={rubrique}><summary class={titreRubrique}>Composition<span aria-hidden="true" class={plus}>+</span></summary>
+            <p class="whitespace-pre-line pb-5 text-sm/6">{p.composition}</p></details>
+        )}
+      </div>
     </div>
   </article>
-  <!-- BARRE D'ACHAT FIXE EN BAS -->
-  <div class="fixed inset-x-0 bottom-0 z-20 border-t border-lin bg-white">
+
+  <!-- Achat sur téléphone : barre fixée en bas -->
+  <div class="fixed inset-x-0 bottom-0 z-20 border-t border-lin bg-white md:hidden">
     <p class="py-2 text-center text-sm">{eur(p.price)}</p>
     <div class="flex">
       <button data-add data-useqty data-id={p.slug} data-name={p.name} data-price={p.price} class="flex-1 bg-terracotta py-4 text-xs font-semibold uppercase tracking-wider text-creme">Ajouter au panier</button>
-      <select data-qty aria-label="Quantité" class="w-20 bg-lin px-3 text-sm">{[1,2,3,4,5,6].map((n) => <option>{n}</option>)}</select>
+      <select data-qty aria-label="Quantité" class="w-20 bg-lin px-3 text-sm">{QUANTITES.map((n) => <option>{n}</option>)}</select>
     </div>
   </div>
-  <!-- Réserve la hauteur de la barre d'achat pour qu'elle ne masque pas le bas du pied de page -->
-  <style is:global>body { padding-bottom: 5.75rem; }</style>
+  <!-- Sur téléphone, réserve la hauteur de la barre d'achat pour qu'elle ne masque pas le bas du pied de page -->
+  <style is:global>body { padding-bottom: 5.75rem; } @media (min-width: 48rem) { body { padding-bottom: 0; } }</style>
 </Base>

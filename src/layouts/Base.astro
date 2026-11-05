@@ -2,7 +2,8 @@
 import '../styles/global.css';
 import { categories, products, eur } from '../data/products';
 import PhotoCadree from '../components/PhotoCadree.astro';
-const { overlay = false, title = 'Maison Allumette | Réchauffez vos intérieurs', description = 'Bougies fleuries, fondants, suspensions, diffuseurs voiture et tablettes parfumées, faits main dans les Landes.' } = Astro.props;
+// bandeau : en-tête blanc en permanence (fiches produit)
+const { overlay = false, bandeau = false, title = 'Maison Allumette | Réchauffez vos intérieurs', description = 'Bougies fleuries, fondants, suspensions, diffuseurs voiture et tablettes parfumées, faits main dans les Landes.' } = Astro.props;
 // La catégorie « Collections capsules » a sa place à droite de l'en-tête, les autres à gauche
 const estCapsule = (slug: string) => /^collections?-capsules?$/.test(slug);
 const capsule = categories.find((c) => estCapsule(c.slug));
@@ -23,7 +24,7 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
 </head>
 <body class="papier-peint font-sans text-encre antialiased">
   <!-- HEADER : burger + menu à gauche, logo centré, recherche et panier à droite -->
-  <header class="site fixed inset-x-0 top-0 z-30">
+  <header class:list={["site fixed inset-x-0 top-0 z-30", bandeau && "is-scrolled"]} data-bandeau={bandeau || undefined}>
     <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-4 py-3 xl:px-6">
       <div class="flex items-center gap-4">
         <button data-menu aria-label="Menu" aria-controls="panneau" class="xl:hidden"><span class="block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span></button>
@@ -249,7 +250,8 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
       if (fleche) { montrerDetail(fleche); return; }
       if (t.closest('[data-retour]')) { fermerDetail(); return; }
       const b = t.closest<HTMLElement>('[data-add]'); if (!b) return;
-      const sel = document.querySelector<HTMLSelectElement>('[data-qty]');
+      // La quantité est le menu déroulant voisin du bouton
+      const sel = b.parentElement?.querySelector<HTMLSelectElement>('[data-qty]');
       const n = b.hasAttribute('data-useqty') && sel ? Number(sel.value) : 1;
       const c = read(); const f = c.find((i) => i.id === b.dataset.id);
       f ? (f.qty += n) : c.push({ id: b.dataset.id!, name: b.dataset.name!, price: Number(b.dataset.price), qty: n });
@@ -257,7 +259,7 @@ const ligne = 'flex items-center justify-between gap-4 py-4';
     });
     // En-tête transparent en haut de page ; le bandeau blanc apparaît quand on dépasse le logo
     const hdr = document.querySelector('header.site')!;
-    const onScroll = () => hdr.classList.toggle('is-scrolled', window.scrollY > 90);
+    const onScroll = () => hdr.classList.toggle('is-scrolled', hdr.hasAttribute('data-bandeau') || window.scrollY > 90);
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     // Une autre page (carte cadeau) a modifié le panier

@@ -1,0 +1,10 @@
+---
+// Le petit modèle de la carte cadeau, aux couleurs de la maison (page /carte-cadeau et accueil).
+const { class: classe = '' } = Astro.props;
+---
+<div class:list={['relative flex aspect-[1.586] w-full -rotate-2 items-center justify-center rounded-2xl bg-olive p-6 text-creme shadow-2xl', classe]}>
+  <span role="img" aria-label="Maison Allumette, Réchauffez vos intérieurs" class="logo-ovale w-[34%]"></span>
+  <span class="absolute bottom-4 left-5 font-serif text-sm italic text-lin">Carte cadeau</span>
+  <span class="absolute right-5 top-4 text-[10px] font-semibold uppercase tracking-[.3em] text-or">Offrir</span>
+  <img src="/brand/ma-pastille-orange.jpg" alt="" loading="lazy" class="absolute -bottom-6 -right-4 w-[22%] max-w-24 rotate-6 rounded-full shadow-lg" />
+</div>

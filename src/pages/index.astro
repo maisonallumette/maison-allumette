@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import ProductCard from '../components/ProductCard.astro';
 import Seal from '../components/Seal.astro';
+import CarteCadeau from '../components/CarteCadeau.astro';
 import { products, categories } from '../data/products';
 const reassurance = [['Paiement sécurisé','Carte bancaire via un prestataire certifié.'],['Livraison soignée','Colis emballé à la main, expédié depuis Mont-de-Marsan.'],['Fait main','Cire végétale, fragrances de Grasse, fleurs séchées d’ici.'],['Écrivez-nous','Une question ? Nous répondons avec plaisir.']];
 ---
@@ -40,5 +41,18 @@ const reassurance = [['Paiement sécurisé','Carte bancaire via un prestataire c
   <!-- RÉASSURANCE -->
   <section class="mx-auto mt-16 grid max-w-6xl grid-cols-2 border-y border-lin px-4 md:grid-cols-4">
     {reassurance.map(([t, d]) => <div class="border-b border-lin p-6 text-center md:border-b-0"><p class="h-title text-sm">{t}</p><p class="mt-2 font-serif text-sm italic">{d}</p></div>)}
+  </section>
+
+  <!-- CARTE CADEAU -->
+  <section class="mx-auto mt-16 max-w-6xl px-4">
+    <a href="/carte-cadeau" class="group grid items-center gap-10 bg-white/80 p-6 md:grid-cols-2 md:p-10">
+      <div class="vichy flex items-center justify-center overflow-hidden px-8 py-12 md:py-14"><CarteCadeau class="max-w-sm transition-transform duration-500 group-hover:rotate-0" /></div>
+      <div class="text-center md:text-left">
+        <p class="text-[11px] font-semibold uppercase tracking-[.3em]">Carte cadeau</p>
+        <h2 class="h-title mt-3 text-2xl md:text-3xl">Offrir Maison Allumette</h2>
+        <p class="mt-4 font-serif text-lg italic">Une carte glissée dans une enveloppe, un petit mot écrit à la main, à utiliser sur le site en une ou plusieurs fois.</p>
+        <span class="mt-8 inline-block border border-olive bg-white px-10 py-3 text-xs font-semibold uppercase tracking-wider transition group-hover:bg-olive group-hover:text-creme">Offrir une carte cadeau</span>
+      </div>
+    </a>
   </section>
 </Base>
