@@ -1,0 +1,125 @@
+---
+// Présentation du Pop-Up Store de Noël de Mont-de-Marsan, aux couleurs du Pop-Up (vert sapin, rose, rouge, or).
+// Informations reprises du dossier 2026 de l'association Pop-Up Store MDM.
+import Base from '../layouts/Base.astro';
+import { POPUP } from '../data/site';
+
+// Étoiles du dossier : grande étoile à 8 branches et petites étincelles à 4 branches
+const etoile = (branches: number, creux: number) => Array.from({ length: branches * 2 }, (_, i) => {
+  const r = i % 2 ? creux : 50, a = (Math.PI * i) / branches - Math.PI / 2;
+  return `${(50 + r * Math.cos(a)).toFixed(1)},${(50 + r * Math.sin(a)).toFixed(1)}`;
+}).join(' ');
+const GRANDE = etoile(8, 20), PETITE = etoile(4, 9);
+const etincelles = [
+  ['left-[8%] top-[18%] w-5', PETITE], ['left-[22%] top-[70%] w-3', PETITE], ['right-[12%] top-[22%] w-6', PETITE],
+  ['right-[26%] top-[78%] w-4', PETITE], ['left-[45%] top-[10%] w-3', PETITE], ['right-[6%] top-[55%] w-3', PETITE],
+  ['left-[6%] top-[52%] w-20 md:w-28', GRANDE], ['right-[18%] bottom-[8%] w-12 md:w-16', GRANDE],
+];
+// Titres pleins avec ombre décalée, comme le logo (les lettres creuses montraient les traits internes de la police)
+const titre = 'font-pop font-black uppercase tracking-tight text-pop-rose [text-shadow:3px_3px_0_var(--color-pop-fuchsia)]';
+// Sur fond crème : fuchsia plein, plus lisible que le rose clair
+const titreClair = 'font-pop font-black uppercase tracking-tight text-pop-fuchsia [text-shadow:3px_3px_0_var(--color-pop-rose)]';
+const surPlace = [
+  ['Un calendrier de l’Avent', 'Un lot à gagner chaque jour.'],
+  ['Deux nocturnes', 'Les samedis 12 et 19 décembre jusqu’à 21h30, avec des invités : tatoueuse, maquilleuse, coiffeuse…'],
+  ['Des ateliers', 'Pour petits et grands : le programme est à suivre sur Instagram.'],
+  ['Une pause douceur', 'Un coin pour les enfants, du thé en libre-service et des canapés pour souffler.'],
+];
+const equipe = [
+  ['Maison Allumette', 'Bougies artisanales fleuries'],
+  ['Petites Îles', 'Rhums arrangés et épices'],
+  ['Camille Design', 'Graphiste et illustratrice'],
+  ['Paulette Intérieurs', 'Affiches et papiers peints'],
+  ['Cr.eative Agency', 'Photographe'],
+];
+---
+<Base title="Pop-Up Store de Noël à Mont-de-Marsan | Maison Allumette" description="Du 20 novembre au 24 décembre, le Pop-Up Store de Noël réunit des créateurs et créatrices des Landes au 43, rue Léon Gambetta à Mont-de-Marsan." bandeau>
+  <!-- OUVERTURE -->
+  <section class="relative overflow-hidden bg-pop-vert px-5 py-20 text-center md:py-28">
+    {etincelles.map(([place, points]) => <svg viewBox="0 0 100 100" aria-hidden="true" class={`absolute fill-pop-or ${place}`}><polygon points={points} /></svg>)}
+    <div class="relative">
+      <h1 class="inline-block">
+        <span class="sr-only">Pop-Up Store</span>
+        <span aria-hidden="true" class="relative block pb-6 font-pop text-[clamp(3.25rem,15vw,8rem)] font-black leading-none tracking-tight text-pop-rose [text-shadow:4px_4px_0_var(--color-pop-fuchsia)]">POP-UP<span class="absolute bottom-0 left-1/2 -translate-x-1/4 -rotate-6 font-popscript text-[0.62em] font-normal text-pop-rouge [text-shadow:none]">store</span></span>
+      </h1>
+      <p class="mt-10 text-sm font-semibold uppercase tracking-[.25em] text-pop-or">Marché de Noël · Mont-de-Marsan</p>
+      <p class="mt-3 font-popscript text-2xl text-pop-or md:text-3xl">Du vendredi 20 novembre au jeudi 24 décembre 2026</p>
+      <div class="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
+        <a href={POPUP.carte} rel="noopener" class="rounded-full bg-pop-rose px-6 py-3 text-xs font-semibold uppercase tracking-wider text-pop-vert transition hover:bg-pop-creme">Comment venir</a>
+        <a href={POPUP.instagram} rel="noopener" class="rounded-full border border-pop-rose px-6 py-3 text-xs font-semibold uppercase tracking-wider text-pop-rose transition hover:bg-pop-rose hover:text-pop-vert">Suivre sur Instagram</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LE PROJET -->
+  <section class="bg-pop-creme px-5 py-16 text-center md:py-20">
+    <h2 class={`${titreClair} text-3xl md:text-5xl`}>Le projet</h2>
+    <p class="mx-auto mt-6 inline-block -skew-x-6 bg-pop-or px-5 py-1 font-popscript text-xl text-white md:text-2xl">Le Pop-Up reprend du service !</p>
+    <div class="mx-auto mt-8 max-w-2xl space-y-4 text-base/7 text-pop-vert">
+      <p>Le Pop-Up Store de Noël revient en plein cœur de Mont-de-Marsan. Pendant quelques semaines, une boutique éphémère haute en couleurs réunit des créateurs et créatrices des Landes : boules à facettes, ambiance disco-chic et atmosphère de fête.</p>
+      <p>De quoi trouver des cadeaux uniques à offrir… ou à s’offrir !</p>
+    </div>
+  </section>
+
+  <!-- INFOS PRATIQUES -->
+  <section class="bg-pop-vert px-5 py-16 text-pop-creme md:py-20">
+    <h2 class={`${titre} text-center text-3xl md:text-5xl`}>Infos pratiques</h2>
+    <div class="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-3">
+      <div class="rounded-3xl border border-pop-rose/60 p-6">
+        <p class="font-popscript text-2xl text-pop-rose">Où ?</p>
+        <p class="mt-3 text-sm/6">{POPUP.adresse}<br />40000 {POPUP.ville}</p>
+        <p class="mt-3 text-sm/6 text-pop-creme/80">Parking Pancault à proximité, transports en commun, rue piétonne le week-end.</p>
+        <a href={POPUP.carte} rel="noopener" class="mt-4 inline-block text-xs font-semibold uppercase tracking-wider text-pop-or underline underline-offset-4">Voir le plan</a>
+      </div>
+      <div class="rounded-3xl border border-pop-rose/60 p-6">
+        <p class="font-popscript text-2xl text-pop-rose">Quand ?</p>
+        <p class="mt-3 text-sm/6">Du vendredi 20 novembre<br />au jeudi 24 décembre</p>
+        <p class="mt-3 text-sm/6 text-pop-creme/80">Le 24 décembre, fermeture à 18h.</p>
+      </div>
+      <div class="rounded-3xl border border-pop-rose/60 p-6">
+        <p class="font-popscript text-2xl text-pop-rose">Horaires</p>
+        <p class="mt-3 text-sm/6">Du lundi au vendredi et le dimanche : 10h – 19h<br />Le samedi : 10h – 20h</p>
+        <p class="mt-3 text-sm/6 text-pop-creme/80">Nocturnes les samedis 12 et 19 décembre, jusqu’à 21h30.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUR PLACE -->
+  <section class="bg-pop-creme px-5 py-16 md:py-20">
+    <h2 class={`${titreClair} text-center text-3xl md:text-5xl`}>Sur place</h2>
+    <p class="mt-3 text-center font-popscript text-xl text-pop-fuchsia">Donner envie de venir… et de rester !</p>
+    <ul class="mx-auto mt-10 grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {surPlace.map(([t, d]) => (
+        <li class="relative rounded-3xl bg-white p-6 pt-8 shadow-sm">
+          <svg viewBox="0 0 100 100" aria-hidden="true" class="absolute -top-4 left-6 w-8 fill-pop-or"><polygon points={GRANDE} /></svg>
+          <p class="font-pop text-sm font-black uppercase text-pop-vert">{t}</p>
+          <p class="mt-2 text-sm/6 text-pop-vert/80">{d}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- MAISON ALLUMETTE AU POP-UP -->
+  <section class="bg-pop-rose px-5 py-16 text-center md:py-20">
+    <p class="font-popscript text-2xl text-pop-rouge">On y sera !</p>
+    <h2 class="mt-2 font-serif text-3xl text-pop-vert md:text-4xl">Maison Allumette au Pop-Up Store</h2>
+    <p class="mx-auto mt-4 max-w-xl text-base/7 text-pop-vert">Venez sentir nos bougies fleuries, fondants et parfums d’intérieur, faits main dans les Landes.</p>
+    <a href="/boutique" class="mt-8 inline-block rounded-full bg-pop-vert px-8 py-3 text-xs font-semibold uppercase tracking-wider text-pop-creme transition hover:bg-pop-rouge">Voir nos créations</a>
+  </section>
+
+  <!-- L'ÉQUIPE -->
+  <section class="relative overflow-hidden bg-pop-vert px-5 py-16 text-center md:py-20">
+    <h2 class={`${titre} text-3xl md:text-5xl`}>L’équipe</h2>
+    <p class="mt-3 font-popscript text-xl text-pop-rose">Un projet mené par une équipe de choc !</p>
+    <ul class="mx-auto mt-10 flex max-w-4xl flex-wrap justify-center gap-4">
+      {equipe.map(([nom, metier]) => (
+        <li class="w-[calc(50%-0.5rem)] rounded-2xl bg-pop-creme px-4 py-5 sm:w-48">
+          <p class="font-pop text-xs font-black uppercase text-pop-fuchsia">{nom}</p>
+          <p class="mt-1 text-sm text-pop-vert">{metier}</p>
+        </li>
+      ))}
+    </ul>
+    <p class="mx-auto mt-10 max-w-lg text-sm/6 text-pop-creme/85">Le Pop-Up Store MDM est une association loi 1901 à but non lucratif, qui a pour objet de promouvoir la création artisanale et locale.</p>
+    <a href={POPUP.instagram} rel="noopener" class="mt-6 inline-block font-popscript text-2xl text-pop-or underline underline-offset-4">@pop.up.store.mdm</a>
+  </section>
+</Base>

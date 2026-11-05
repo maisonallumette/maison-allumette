@@ -1,0 +1,13 @@
+---
+// Lien vers la présentation du Pop-Up Store, dans les couleurs et l'écriture du Pop-Up.
+// « POP-UP » : Unbounded, proche de la police Hagrid du dossier (payante) ; « store » et le texte : Story Script, la police du dossier.
+// Le texte s'adapte aux dates et le lien disparaît après la fermeture (script dans Base.astro).
+import { POPUP } from '../data/site';
+const { class: classe = '', grand = false } = Astro.props;
+---
+<a href="/pop-up-store" data-popup data-ouverture={POPUP.ouverture} data-fermeture={POPUP.fermeture}
+  aria-label="Pop-Up Store de Mont-de-Marsan : ouverture le 20 novembre"
+  class:list={['items-center gap-3 rounded-full bg-pop-vert text-pop-or transition-transform hover:-rotate-1', grand ? 'inline-flex px-5 py-3' : 'px-4 py-2', classe]}>
+  <span aria-hidden="true" class:list={['relative shrink-0 whitespace-nowrap font-pop font-black leading-none tracking-tight text-pop-rose [text-shadow:1.5px_1.5px_0_var(--color-pop-fuchsia)]', grand ? 'pb-2.5 text-xl' : 'pb-2 text-[13px]']}>POP-UP<span class:list={['absolute right-0 -rotate-6 font-popscript font-normal text-pop-rouge [text-shadow:none]', grand ? '-bottom-1.5 text-lg' : '-bottom-1 text-[13px]']}>store</span></span>
+  <span aria-hidden="true" data-popup-texte class:list={['font-popscript normal-case tracking-normal', grand ? 'text-lg' : 'text-[15px]']}>Mont-de-Marsan · dès le 20 nov.</span>
+</a>

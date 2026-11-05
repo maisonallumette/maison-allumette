@@ -9,6 +9,8 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 - Le dossier du projet est `C:\Users\user\maison-allumette`. Ne jamais mélanger avec le site La Régence.
 
 ## Fichiers clés
+- `src/data/site.ts` : `VENTE_EN_LIGNE` (false = site vitrine : ni panier ni bouton d'achat, prix affichés ; true pour rouvrir la vente une fois le paiement branché) et infos du Pop-Up Store (dates, adresse).
+- `src/pages/pop-up-store.astro` + `src/components/PopupLien.astro` : Pop-Up Store de Noël de Mont-de-Marsan (20 nov. – 24 déc. 2026), couleurs et écriture du Pop-Up (Story Script ; Unbounded à la place de Hagrid, police payante). Le lien de l'en-tête disparaît après la fermeture.
 - `src/styles/global.css` : thème provisoire (couleurs, polices), `.h-title`, `.vichy` (motif vichy), `.papier-peint` (larges bandes beiges sur crème), comportement de l'en-tête.
 - `src/layouts/Base.astro` : en-tête (transparent en haut, bandeau blanc après 90 px de défilement ; catégories à gauche, sauf la catégorie d'adresse `collections-capsules`, placée à droite avant la loupe et le panier), panneau du menu (ouvert par une catégorie, la loupe ou le burger : onglets des catégories, recherche, sous-catégories, deux produits sur grand écran ; la flèche « › » d'une ligne élargit le cadre pour montrer ses produits), newsletter, pied de page, panier en localStorage.
 - `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit en trois cadres : bandeau blanc, photo fixe à gauche, informations sur fond crème à droite ; barre d'achat fixe sur téléphone), `carte-cadeau.astro` (« Offrir Maison Allumette » : carte envoyée avec un mot écrit à la main ; paiement et codes encore à brancher).

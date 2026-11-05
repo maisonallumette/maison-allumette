@@ -42,6 +42,11 @@
       "slug": "bouquets-eternels",
       "name": "Bouquets éternels",
       "subcategories": []
+    },
+    {
+      "slug": "collections-capsules",
+      "name": "Collections capsules",
+      "subcategories": []
     }
   ],
   "products": [

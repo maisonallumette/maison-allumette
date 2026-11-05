@@ -3,6 +3,7 @@
 // À BRANCHER avec le paiement : création du code, suivi du solde, utilisation en une ou plusieurs fois.
 import Base from '../layouts/Base.astro';
 import CarteCadeau from '../components/CarteCadeau.astro';
+import { VENTE_EN_LIGNE } from '../data/site';
 const MIN = 15, MAX = 200; // montants acceptés, à ajuster
 const MONTANTS = [20, 30, 50, 80];
 const MOT_MAX = 200;
@@ -20,64 +21,77 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
 
     <div class="px-5 py-10 md:min-h-[calc(100svh-5rem)] md:px-10 md:py-16 lg:px-16">
       <div class="mx-auto max-w-lg">
-        <div class="flex justify-center gap-8">
+        {VENTE_EN_LIGNE && <div class="flex justify-center gap-8">
           <button type="button" data-onglet="offrir" aria-pressed="true" class={onglet}>J'offre une carte</button>
           <button type="button" data-onglet="utiliser" aria-pressed="false" class={onglet}>J'ai une carte</button>
-        </div>
+        </div>}
         <h1 class="h-title mt-8 text-center text-2xl">Offrir Maison Allumette</h1>
         <p class="mt-3 text-center font-serif text-lg italic">Une carte glissée dans une enveloppe, un petit mot écrit à la main : de quoi réchauffer l'intérieur de quelqu'un que vous aimez.</p>
 
-        <!-- J'OFFRE -->
-        <form data-section="offrir" novalidate class="mt-8 space-y-6">
-          <fieldset>
-            <legend class={label}>Montant <span class="font-normal normal-case tracking-normal">({MIN} € à {MAX} €)</span></legend>
-            <div class="mt-2 flex flex-wrap gap-2">
-              {MONTANTS.map((m) => <button type="button" data-montant={m} aria-pressed="false" class="border border-olive px-4 py-2 text-sm aria-pressed:bg-olive aria-pressed:text-creme">{m} €</button>)}
+        {VENTE_EN_LIGNE ? (
+          <>
+            <!-- J'OFFRE -->
+            <form data-section="offrir" novalidate class="mt-8 space-y-6">
+              <fieldset>
+                <legend class={label}>Montant <span class="font-normal normal-case tracking-normal">({MIN} € à {MAX} €)</span></legend>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  {MONTANTS.map((m) => <button type="button" data-montant={m} aria-pressed="false" class="border border-olive px-4 py-2 text-sm aria-pressed:bg-olive aria-pressed:text-creme">{m} €</button>)}
+                </div>
+                <label for="cc-montant" class="sr-only">Autre montant en euros</label>
+                <input id="cc-montant" name="montant" type="number" inputmode="numeric" min={MIN} max={MAX} step="1" required placeholder="Autre montant, par exemple 40" class={champ} />
+              </fieldset>
+    
+              <fieldset class="space-y-4">
+                <legend class={label}>Pour qui ?</legend>
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label for="cc-prenom" class="text-sm">Prénom</label><input id="cc-prenom" name="prenom" required autocomplete="off" class={champ} /></div>
+                  <div><label for="cc-nom" class="text-sm">Nom</label><input id="cc-nom" name="nom" required autocomplete="off" class={champ} /></div>
+                </div>
+              </fieldset>
+    
+              <fieldset class="space-y-4">
+                <legend class={label}>Où l'envoyer ?</legend>
+                <div><label for="cc-adresse" class="text-sm">Adresse</label><input id="cc-adresse" name="adresse" required autocomplete="off" class={champ} /></div>
+                <div class="grid grid-cols-[2fr_3fr] gap-3">
+                  <div><label for="cc-cp" class="text-sm">Code postal</label><input id="cc-cp" name="cp" required inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="off" class={champ} /></div>
+                  <div><label for="cc-ville" class="text-sm">Ville</label><input id="cc-ville" name="ville" required autocomplete="off" class={champ} /></div>
+                </div>
+              </fieldset>
+    
+              <div>
+                <label for="cc-mot" class={label}>Votre petit mot</label>
+                <p class="mt-1 text-sm">Nous le recopions à la main sur la carte.</p>
+                <textarea id="cc-mot" name="mot" rows="4" maxlength={MOT_MAX} required class={champ}></textarea>
+                <p class="mt-1 text-right text-xs" aria-live="polite"><span data-compteur>0</span> / {MOT_MAX} caractères</p>
+              </div>
+    
+              <div>
+                <label for="cc-de" class={label}>De la part de</label>
+                <input id="cc-de" name="de" required class={champ} />
+              </div>
+    
+              <p data-erreur role="alert" hidden class="border border-terracotta bg-white p-3 text-sm"></p>
+              <button class="w-full bg-olive py-4 text-xs font-semibold uppercase tracking-wider text-creme">Ajouter au panier</button>
+              <p data-ok role="status" hidden class="border border-olive bg-white p-3 text-sm"></p>
+            </form>
+    
+            <!-- J'AI UNE CARTE -->
+            <div data-section="utiliser" hidden class="mt-8 space-y-4 text-sm/6">
+              <p>Le code de votre carte est inscrit au dos, sous le petit mot.</p>
+              <p>Saisissez-le au moment de valider votre commande : son montant est déduit de votre panier. Vous pouvez l'utiliser en une ou plusieurs fois, ce qui n'est pas dépensé reste sur la carte pour la prochaine commande.</p>
+              <a href="/boutique" class="mt-2 block border border-olive py-3 text-center text-xs font-semibold uppercase tracking-wider">Découvrir la boutique</a>
             </div>
-            <label for="cc-montant" class="sr-only">Autre montant en euros</label>
-            <input id="cc-montant" name="montant" type="number" inputmode="numeric" min={MIN} max={MAX} step="1" required placeholder="Autre montant, par exemple 40" class={champ} />
-          </fieldset>
-
-          <fieldset class="space-y-4">
-            <legend class={label}>Pour qui ?</legend>
-            <div class="grid grid-cols-2 gap-3">
-              <div><label for="cc-prenom" class="text-sm">Prénom</label><input id="cc-prenom" name="prenom" required autocomplete="off" class={champ} /></div>
-              <div><label for="cc-nom" class="text-sm">Nom</label><input id="cc-nom" name="nom" required autocomplete="off" class={champ} /></div>
-            </div>
-          </fieldset>
-
-          <fieldset class="space-y-4">
-            <legend class={label}>Où l'envoyer ?</legend>
-            <div><label for="cc-adresse" class="text-sm">Adresse</label><input id="cc-adresse" name="adresse" required autocomplete="off" class={champ} /></div>
-            <div class="grid grid-cols-[2fr_3fr] gap-3">
-              <div><label for="cc-cp" class="text-sm">Code postal</label><input id="cc-cp" name="cp" required inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="off" class={champ} /></div>
-              <div><label for="cc-ville" class="text-sm">Ville</label><input id="cc-ville" name="ville" required autocomplete="off" class={champ} /></div>
-            </div>
-          </fieldset>
-
-          <div>
-            <label for="cc-mot" class={label}>Votre petit mot</label>
-            <p class="mt-1 text-sm">Nous le recopions à la main sur la carte.</p>
-            <textarea id="cc-mot" name="mot" rows="4" maxlength={MOT_MAX} required class={champ}></textarea>
-            <p class="mt-1 text-right text-xs" aria-live="polite"><span data-compteur>0</span> / {MOT_MAX} caractères</p>
+          </>
+        ) : (
+          <!-- Site vitrine : la commande en ligne arrive bientôt -->
+          <div class="mt-8 border border-olive bg-white/90 p-6 text-center">
+            <p class="h-title text-sm">Bientôt sur le site</p>
+            <p class="mt-3 text-sm/6">La carte cadeau pourra bientôt se commander ici : un montant au choix, un petit mot recopié à la main et l'envoi par la poste.</p>
+            <p class="mt-3 text-sm/6">En attendant, venez découvrir nos créations au Pop-Up Store de Mont-de-Marsan, du 20 novembre au 24 décembre.</p>
+            <a href="/pop-up-store" class="mt-6 block bg-olive py-3 text-xs font-semibold uppercase tracking-wider text-creme">Découvrir le Pop-Up Store</a>
+            <a href="/boutique" class="mt-2 block border border-olive py-3 text-xs font-semibold uppercase tracking-wider">Voir nos créations</a>
           </div>
-
-          <div>
-            <label for="cc-de" class={label}>De la part de</label>
-            <input id="cc-de" name="de" required class={champ} />
-          </div>
-
-          <p data-erreur role="alert" hidden class="border border-terracotta bg-white p-3 text-sm"></p>
-          <button class="w-full bg-olive py-4 text-xs font-semibold uppercase tracking-wider text-creme">Ajouter au panier</button>
-          <p data-ok role="status" hidden class="border border-olive bg-white p-3 text-sm"></p>
-        </form>
-
-        <!-- J'AI UNE CARTE -->
-        <div data-section="utiliser" hidden class="mt-8 space-y-4 text-sm/6">
-          <p>Le code de votre carte est inscrit au dos, sous le petit mot.</p>
-          <p>Saisissez-le au moment de valider votre commande : son montant est déduit de votre panier. Vous pouvez l'utiliser en une ou plusieurs fois, ce qui n'est pas dépensé reste sur la carte pour la prochaine commande.</p>
-          <a href="/boutique" class="mt-2 block border border-olive py-3 text-center text-xs font-semibold uppercase tracking-wider">Découvrir la boutique</a>
-        </div>
+        )}
       </div>
     </div>
   </section>
@@ -93,18 +107,20 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
     </ul>
   </section>
 
-  <section class="mx-auto max-w-3xl px-4 py-14">
+  {VENTE_EN_LIGNE && <section class="mx-auto max-w-3xl px-4 py-14">
     <h2 class="h-title text-xl">Questions fréquentes</h2>
     <details class="mt-6 border-t border-lin py-4"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Comment l'offrir ?</summary>
       <p class="mt-3 text-sm/6">Choisissez un montant, indiquez à qui l'envoyer et écrivez votre petit mot. Nous le recopions à la main sur la carte, puis nous l'envoyons par la poste, directement à la personne.</p></details>
     <details class="border-t border-lin py-4"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Comment l'utiliser ?</summary>
       <p class="mt-3 text-sm/6">Le code est inscrit au dos de la carte. Il se saisit au moment de valider une commande sur le site, en une ou plusieurs fois.</p></details>
     <div class="border-t border-lin"></div>
-  </section>
+  </section>}
 
   <script>
     const MIN = 15, MAX = 200;
-    const form = document.querySelector<HTMLFormElement>('form[data-section="offrir"]')!;
+    // Site vitrine : pas de formulaire, rien à faire
+    const form = document.querySelector<HTMLFormElement>('form[data-section="offrir"]');
+    if (form) {
     const montant = form.querySelector<HTMLInputElement>('#cc-montant')!;
     const boutons = [...form.querySelectorAll<HTMLButtonElement>('[data-montant]')];
     const mot = form.querySelector<HTMLTextAreaElement>('#cc-mot')!;
@@ -152,5 +168,6 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
       ok.textContent = `La carte cadeau de ${eur(somme)} pour ${details.prenom} est dans votre panier.`;
       ok.hidden = false;
     });
+    }
   </script>
 </Base>

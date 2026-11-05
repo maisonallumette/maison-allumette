@@ -1,13 +1,14 @@
 ---
 import { eur, categoryName, subcategoryName } from '../data/products';
 import PhotoCadree from './PhotoCadree.astro';
+import { VENTE_EN_LIGNE } from '../data/site';
 const { p } = Astro.props;
 ---
 <article class="flex flex-col" data-cat={p.category} data-sub={p.subcategory} data-search={`${p.name} ${categoryName(p.category)} ${subcategoryName(p.category, p.subcategory)}`.toLowerCase()}>
   <div class="relative">
     <a href={`/produits/${p.slug}`} class="block"><PhotoCadree p={p} loading="lazy" /></a>
-    <button data-add data-id={p.slug} data-name={p.name} data-price={p.price}
-      class="absolute inset-x-0 bottom-0 border border-olive bg-creme py-2 text-xs font-medium uppercase tracking-wider transition hover:bg-olive hover:text-creme">Ajouter au panier</button>
+    {VENTE_EN_LIGNE && <button data-add data-id={p.slug} data-name={p.name} data-price={p.price}
+      class="absolute inset-x-0 bottom-0 border border-olive bg-creme py-2 text-xs font-medium uppercase tracking-wider transition hover:bg-olive hover:text-creme">Ajouter au panier</button>}
   </div>
   <h3 class="h-title mt-3 text-lg leading-tight"><a href={`/produits/${p.slug}`}>{p.name}</a></h3>
   <p class="mt-1 font-serif text-sm italic text-encre/70">{p.short}</p>

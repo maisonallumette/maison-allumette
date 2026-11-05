@@ -12,6 +12,15 @@
   --font-script: "Pinyon Script", cursive;
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-sans: "Montserrat", system-ui, sans-serif;
+  /* Pop-Up Store de Mont-de-Marsan (couleurs relevées sur son dossier) */
+  --color-pop-vert: #0f453d;
+  --color-pop-rose: #f5b4d3;
+  --color-pop-fuchsia: #e8579a;
+  --color-pop-rouge: #e30613;
+  --color-pop-or: #d4a46c;
+  --color-pop-creme: #fbf1e6;
+  --font-pop: "Unbounded", "Arial Black", sans-serif;
+  --font-popscript: "Story Script", cursive;
 }
 .h-title { font-family: var(--font-serif); text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
 .vichy { background-color: var(--color-creme);
