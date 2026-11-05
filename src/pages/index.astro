@@ -7,17 +7,21 @@ const tiles = [['Bougies','bougies'],['Fondants','fondants'],['Tablettes','table
 const reassurance = [['Paiement sécurisé','Carte bancaire via un prestataire certifié.'],['Livraison soignée','Colis emballé à la main, expédié depuis Mont-de-Marsan.'],['Fait main','Cire végétale, fragrances de Grasse, fleurs séchées d’ici.'],['Écrivez-nous','Une question ? Nous répondons avec plaisir.']];
 ---
 <Base overlay>
-  <!-- HERO : photo en haut sur mobile ; volet crème + photo côte à côte sur grand écran -->
-  <section class="grid md:min-h-[85vh] md:grid-cols-2">
+  <!-- HERO : photo en haut sur mobile ; volet crème + photo côte à côte, à la hauteur exacte de l'écran, sur grand écran -->
+  <section class="grid md:h-svh md:min-h-[600px] md:grid-cols-2">
     <div class="relative order-first h-[55vh] bg-sauge md:order-last md:h-auto">
-      <img src="/placeholder.svg" alt="Bougie allumée près d'une fenêtre" class="size-full object-cover" /> <!-- Photo ambiance à fournir -->
-      <Seal class="absolute bottom-4 right-4 w-28 md:w-36" />
+      <img src="/images/accueil-fenetre.jpg" alt="Bougie allumée sur un rebord de fenêtre, devant une forêt sous la pluie" class="absolute inset-0 size-full object-cover object-[50%_70%]" />
+      <!-- Voile crème : garde le logo et le menu lisibles sur la photo sombre -->
+      <div class="absolute inset-x-0 top-0 h-36 bg-linear-to-b from-creme via-creme/75 to-transparent"></div>
+      <Seal class="absolute bottom-4 right-4 w-28 md:bottom-20 lg:w-36" />
     </div>
-    <div class="flex min-w-0 flex-col items-center justify-center px-4 py-14 text-center md:px-6">
-      <div class="bg-creme/95 px-5 py-10 shadow-sm md:px-8"><p class="text-[11px] font-semibold uppercase tracking-[.3em]">Fait main dans les Landes</p>
+    <div class="flex min-w-0 flex-col items-center justify-center px-4 py-14 text-center md:px-6 md:pb-10 md:pt-28">
+      <div class="relative bg-creme/95 px-5 py-10 shadow-sm md:px-8"><p class="text-[11px] font-semibold uppercase tracking-[.3em]">Fait main dans les Landes</p>
       <h1 class="h-title mt-3 text-[clamp(1.75rem,9.5vw,3rem)] leading-none md:text-[clamp(2rem,4.2vw,3.75rem)]">Réchauffez<br />vos intérieurs</h1>
-      <p class="mt-5 max-w-sm font-serif text-lg italic">Bougies fleuries, fondants et parfums d’intérieur, en cire végétale et fragrances de Grasse.</p>
-      <a href="/boutique" class="mt-8 inline-block border border-olive bg-white px-10 py-3 text-xs font-semibold uppercase tracking-wider transition hover:bg-olive hover:text-creme">Acheter maintenant</a></div>
+      <p class="mx-auto mt-5 max-w-sm font-serif text-lg italic">Bougies fleuries, fondants et parfums d’intérieur, en cire végétale et fragrances de Grasse.</p>
+      <a href="/boutique" class="mt-8 inline-block border border-olive bg-white px-10 py-3 text-xs font-semibold uppercase tracking-wider transition hover:bg-olive hover:text-creme">Acheter maintenant</a>
+      <!-- Sticker à cheval sur l'angle du cadre -->
+      <span class="absolute -bottom-12 -right-1 block w-20 -rotate-[10deg] overflow-hidden rounded-full shadow-md md:-right-6 lg:-right-10 lg:w-28"><img src="/brand/ma-pastille-orange.jpg" alt="" width="928" height="928" class="block scale-[1.03]" /></span></div>
     </div>
   </section>
 

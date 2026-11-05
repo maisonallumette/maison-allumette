@@ -12,7 +12,7 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 - `src/styles/global.css` : thème provisoire (couleurs, polices), `.h-title`, `.vichy` (motif vichy), `.papier-peint` (larges bandes beiges sur crème), comportement de l'en-tête.
 - `src/layouts/Base.astro` : en-tête (transparent en haut, bandeau blanc après 90 px de défilement), tiroir mobile, newsletter, pied de page, panier en localStorage.
 - `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit, barre d'achat fixe).
-- `src/components/ProductCard.astro`, `Seal.astro` (sceau provisoire).
+- `src/components/ProductCard.astro`, `Seal.astro` (sceau officiel, crème et orange).
 - `src/data/products.ts` : produits (noms, prix, descriptions d'exemple à remplacer).
 
 ## Direction artistique
@@ -23,6 +23,7 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
   Remplacer les valeurs provisoires de `@theme` dans `src/styles/global.css` (olive, sauge, lin, creme, terracotta, cuivre).
 - Logos fournis : sceau rond « Maison Allumette · Homemade in Landes 2021 » (hortensia), écusson ovale avec la maison (« maison » en script + ALLUMETTE + « Réchauffez vos intérieurs »), fleur seule dans un rond (pastille). Versions SVG noires dans `public/brand/` : `ma-tampon-ronde.svg`, `ma-tampon-ovale.svg` (à recolorer en CSS ou à demander à la graphiste en couleurs).
 - Planches d'ambiance : forêt sous la pluie, bougie sur rebord de fenêtre, bottes vertes, bruyère, boiseries sauge, vichy beige, lin sauge/olive. Ton : cottage, brumeux, chaud.
+- Fichiers utilisés : `public/brand/ma-sceau-creme.jpg`, `ma-pastille-orange.jpg`, `public/images/accueil-fenetre.jpg`. Originaux de la graphiste (toutes les couleurs, planches, PDF) dans `sources-marque/`, ignoré par Git : présent seulement sur l'ordinateur où il a été déposé.
 - Polices : le script « maison » et les capitales fines d'ALLUMETTE sont dans le logo. Pour le texte du site, Cormorant Garamond + Montserrat restent un choix provisoire tant que la graphiste n'a pas confirmé.
 
 ## À faire

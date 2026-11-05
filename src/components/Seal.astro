@@ -1,7 +1,7 @@
 ---
-// Sceau rond de la marque : logo de la graphiste en crème sur disque orange
+// Sceau rond officiel de la graphiste (encre orange sur crème). Le léger zoom masque les coins noirs du JPEG.
 const { class: c = '' } = Astro.props;
 ---
-<span role="img" aria-label="Maison Allumette, Homemade in Landes, 2021" class={`block aspect-square rounded-full bg-terracotta p-1 text-creme ${c}`}>
-  <span class="logo-ronde w-full"></span>
+<span class={`block overflow-hidden rounded-full shadow-md ${c}`}>
+  <img src="/brand/ma-sceau-creme.jpg" alt="Maison Allumette, Homemade in Landes, 2021" width="928" height="928" class="block scale-[1.03]" />
 </span>

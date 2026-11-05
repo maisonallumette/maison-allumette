@@ -19,8 +19,7 @@
   background-size: 28px 28px; }
 
 /* Logos noirs de la graphiste, recolorés par masque : ils prennent la couleur du texte (currentColor) */
-.logo-ronde, .logo-ovale { display: block; background-color: currentColor; -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat; }
-.logo-ronde { --logo: url("/brand/ma-tampon-ronde.svg"); aspect-ratio: 1; }
+.logo-ovale { display: block; background-color: currentColor; -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat; }
 .logo-ovale { --logo: url("/brand/ma-tampon-ovale.svg"); aspect-ratio: 224 / 265; }
 
 /* Papier peint cottage : larges bandes beiges sur fond crème (ajuster largeur/couleurs ici) */
