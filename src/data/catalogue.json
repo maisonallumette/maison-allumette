@@ -1,46 +1,131 @@
 {
   "categories": [
-    { "slug": "bougies", "name": "Bougies", "subcategories": [] },
-    { "slug": "fondants", "name": "Fondants", "subcategories": [] },
-    { "slug": "suspensions", "name": "Suspensions", "subcategories": [] },
-    { "slug": "voiture", "name": "Voiture", "subcategories": [] },
-    { "slug": "tablettes", "name": "Tablettes", "subcategories": [] }
+    {
+      "slug": "bougies",
+      "name": "Bougies",
+      "subcategories": [
+        {
+          "slug": "bougies-decoratives",
+          "name": "Bougies décoratives"
+        },
+        {
+          "slug": "bougies-a-allumer",
+          "name": "Bougies à allumer"
+        },
+        {
+          "slug": "bougies-chiffres-d-anniversaire",
+          "name": "Bougies chiffres d'anniversaire"
+        }
+      ]
+    },
+    {
+      "slug": "suspensions",
+      "name": "Suspensions",
+      "subcategories": []
+    },
+    {
+      "slug": "voiture",
+      "name": "Diffuseurs",
+      "subcategories": []
+    },
+    {
+      "slug": "tablettes",
+      "name": "Tablettes",
+      "subcategories": []
+    },
+    {
+      "slug": "bruleurs",
+      "name": "Bruleurs",
+      "subcategories": []
+    },
+    {
+      "slug": "bouquets-eternels",
+      "name": "Bouquets éternels",
+      "subcategories": []
+    }
   ],
   "products": [
     {
-      "slug": "bougie-fleurie", "name": "Bougie fleurie", "category": "bougies", "subcategory": "", "price": 18, "image": "",
+      "slug": "bougie-fleurie",
+      "name": "Bougie fleurie",
+      "category": "bougies",
+      "subcategory": "bougies-decoratives",
+      "price": 29,
+      "image": "/images/produits/bougie-fleurie.jpg",
       "short": "Cire végétale et fleurs séchées des Landes.",
       "description": "Une bougie coulée à la main, parée de fleurs séchées locales et de paillettes biodégradables. Elle parfume la pièce en douceur et se garde ensuite comme un joli objet.",
-      "notes": ["Cire végétale", "Fragrance de Grasse", "Fleurs séchées locales", "Fait main dans les Landes"],
-      "conseils": "", "composition": ""
+      "notes": [
+        "Cire végétale",
+        "Fragrance de Grasse",
+        "Fleurs séchées locales",
+        "Fait main dans les Landes"
+      ],
+      "conseils": "",
+      "composition": ""
     },
     {
-      "slug": "fondants-parfumes", "name": "Fondants parfumés", "category": "fondants", "subcategory": "", "price": 7, "image": "",
-      "short": "Pour parfumer la maison sans flamme.",
-      "description": "Des fondants à faire fondre dans un brûle-parfum, pour une odeur généreuse sans flamme.",
-      "notes": ["Sans flamme", "Fragrance de Grasse", "Fait main dans les Landes"],
-      "conseils": "", "composition": ""
-    },
-    {
-      "slug": "suspension-parfumee", "name": "Suspension parfumée", "category": "suspensions", "subcategory": "", "price": 9, "image": "",
+      "slug": "suspension-parfumee",
+      "name": "Suspension parfumée",
+      "category": "suspensions",
+      "subcategory": "",
+      "price": 9,
+      "image": "/images/produits/suspension-parfumee.jpg",
       "short": "À glisser dans un placard ou un tiroir.",
       "description": "Une suspension parfumée pour les armoires, les dressings et les petits recoins de la maison.",
-      "notes": ["Format 50 g", "Fragrance de Grasse", "Cornet kraft"],
-      "conseils": "", "composition": ""
+      "notes": [
+        "Format 50 g",
+        "Fragrance de Grasse",
+        "Cornet kraft"
+      ],
+      "conseils": "",
+      "composition": ""
     },
     {
-      "slug": "diffuseur-voiture", "name": "Diffuseur voiture", "category": "voiture", "subcategory": "", "price": 12, "image": "",
+      "slug": "diffuseur-voiture",
+      "name": "Diffuseur voiture",
+      "category": "voiture",
+      "subcategory": "",
+      "price": 12,
+      "image": "/images/produits/diffuseur-voiture.jpg",
       "short": "Un parfum doux pour chaque trajet.",
       "description": "Un diffuseur à accrocher au rétroviseur ou à glisser dans l’habitacle, pour des trajets qui sentent bon.",
-      "notes": ["14 ml", "Fragrance de Grasse", "Fait main dans les Landes"],
-      "conseils": "", "composition": ""
+      "notes": [
+        "14 ml",
+        "Fragrance de Grasse",
+        "Fait main dans les Landes"
+      ],
+      "conseils": "",
+      "composition": ""
     },
     {
-      "slug": "tablettes-parfumees", "name": "Tablettes parfumées", "category": "tablettes", "subcategory": "", "price": 8, "image": "",
+      "slug": "tablettes-parfumees",
+      "name": "Tablettes parfumées",
+      "category": "tablettes",
+      "subcategory": "",
+      "price": 8,
+      "image": "/images/produits/tablettes-parfumees.jpg",
       "short": "De petites attentions à offrir.",
       "description": "Des tablettes parfumées en cire végétale, à poser dans un meuble ou à offrir en petit cadeau.",
-      "notes": ["Cire végétale", "Idée cadeau", "Fait main dans les Landes"],
-      "conseils": "", "composition": ""
+      "notes": [
+        "Cire végétale",
+        "Idée cadeau",
+        "Fait main dans les Landes"
+      ],
+      "conseils": "",
+      "composition": ""
+    },
+    {
+      "slug": "bruleur-botte-cow-girl",
+      "name": "Bruleur botte cow girl",
+      "category": "bruleurs",
+      "subcategory": "",
+      "price": 16.9,
+      "image": "/images/produits/bruleur-botte-cow-girl.jpg",
+      "short": "",
+      "description": "Éveillez vos sens avec ce brûleur d'huiles essentielles et chauffe-cire en forme de botte de cowboy rose, idéal pour diffuser de douces senteurs dans votre intérieur ! Parfait pour toutes les passionnées de cowboy, cet objet déco unique allie tendance et fonctionnalité. Compatible avec les huiles parfumées diluées et les fondants parfumés.\n. Taille du produit : 13,5 cm x 14,5 cm x 7 cm\n. Poids du produit : 305 g",
+      "notes": [],
+      "conseils": "",
+      "composition": ""
     }
   ]
 }
