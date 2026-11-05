@@ -1,9 +1,16 @@
 ---
 import '../styles/global.css';
-import { categories } from '../data/products';
+import { categories, products } from '../data/products';
+import PhotoCadree from '../components/PhotoCadree.astro';
 const { overlay = false, title = 'Maison Allumette | Réchauffez vos intérieurs', description = 'Bougies fleuries, fondants, suspensions, diffuseurs voiture et tablettes parfumées, faits main dans les Landes.' } = Astro.props;
-// Au-delà de 5 catégories, le menu ordinateur renvoie vers la boutique pour ne pas passer sous le logo
-const navOrdi = categories.slice(0, 5);
+// La catégorie « Collections capsules » a sa place à droite de l'en-tête, les autres à gauche
+const estCapsule = (slug: string) => /^collections?-capsules?$/.test(slug);
+const capsule = categories.find((c) => estCapsule(c.slug));
+const navOrdi = categories.filter((c) => !estCapsule(c.slug));
+// Pour ne pas passer sous le logo : 4 catégories sur un écran moyen, 6 sur un grand, puis « Tout voir » renvoie vers la boutique
+const NAV_MOYEN = 4, NAV_GRAND = 6;
+const produitsDe = (slug: string) => products.filter((p) => p.category === slug);
+const ligne = 'flex items-center justify-between gap-4 py-4';
 ---
 <!doctype html>
 <html lang="fr">
@@ -17,21 +24,25 @@ const navOrdi = categories.slice(0, 5);
 <body class="papier-peint font-sans text-encre antialiased">
   <!-- HEADER : burger + menu à gauche, logo centré, recherche et panier à droite -->
   <header class="site fixed inset-x-0 top-0 z-30">
-    <div class="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-4 py-3">
+    <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-4 py-3 xl:px-6">
       <div class="flex items-center gap-4">
-        <button data-menu aria-label="Menu" class="xl:hidden"><span class="block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span></button>
-        <nav class="hidden gap-6 text-xs font-semibold uppercase tracking-wider xl:flex">{navOrdi.map((c) => <a href={`/boutique?categorie=${c.slug}`}>{c.name}</a>)}{categories.length > 5 && <a href="/boutique">Tout voir</a>}</nav>
+        <button data-menu aria-label="Menu" aria-controls="panneau" class="xl:hidden"><span class="block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span><span class="mt-1.5 block h-px w-6 bg-encre"></span></button>
+        <nav class="hidden gap-5 whitespace-nowrap text-xs font-semibold uppercase tracking-wider xl:flex">
+          {navOrdi.map((c, i) => <a href={`/boutique?categorie=${c.slug}`} data-ouvre={c.slug} aria-controls="panneau" class:list={[i >= NAV_GRAND ? 'hidden' : i >= NAV_MOYEN && 'hidden 2xl:block']}>{c.name}</a>)}
+          {navOrdi.length > NAV_MOYEN && <a href="/boutique" class:list={[navOrdi.length <= NAV_GRAND && '2xl:hidden']}>Tout voir</a>}
+        </nav>
       </div>
       <!-- LOGO provisoire en texte : à remplacer par le SVG du designer -->
       <a href="/" class="logo-wrap text-center leading-none">
         <span class="block font-script text-3xl text-olive">maison</span>
         <span class="block font-serif text-sm tracking-[.35em] text-olive">ALLUMETTE</span>
       </a>
-      <!-- Sur mobile : icônes seules, pour laisser la place au logo -->
-      <div class="flex items-center justify-end gap-3 text-xs font-semibold uppercase tracking-wider md:gap-4">
-        <a href="/boutique" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-6 md:hidden"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span class="hidden md:inline">Rechercher</span></a>
+      <!-- Collections capsules (sur ordinateur ; dans le tiroir sur mobile), puis loupe et panier tout à droite -->
+      <div class="flex items-center justify-end gap-4 text-xs font-semibold uppercase tracking-wider md:gap-5">
+        {capsule && <a href={`/boutique?categorie=${capsule.slug}`} data-ouvre={capsule.slug} aria-controls="panneau" class="hidden whitespace-nowrap xl:block">{capsule.name}</a>}
+        <a href="/boutique" data-ouvre-recherche aria-controls="panneau" aria-label="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-6"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></a>
         <details class="relative">
-          <summary aria-label="Panier" class="flex cursor-pointer list-none items-center gap-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-6 md:hidden"><path d="M6 8h12l1 12H5L6 8Z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg><span class="hidden md:inline">Panier</span> <span data-cart-count class="rounded-full bg-terracotta px-2 text-creme">0</span></summary>
+          <summary aria-label="Panier" class="relative block cursor-pointer list-none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-6"><path d="M6 8h12l1 12H5L6 8Z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg><span data-cart-count class="absolute -right-1.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-terracotta px-1 text-[10px] tracking-normal text-creme">0</span></summary>
           <div class="absolute right-0 mt-3 w-72 border border-lin bg-white p-4 shadow-lg">
             <ul data-cart-list class="space-y-2 text-sm normal-case tracking-normal"></ul>
             <p class="mt-3 flex justify-between border-t border-lin pt-3"><span>Total</span><span data-cart-total>0,00 €</span></p>
@@ -43,16 +54,54 @@ const navOrdi = categories.slice(0, 5);
     </div>
   </header>
 
-  <!-- MENU MOBILE (tiroir) -->
+  <!-- PANNEAU DU MENU : ouvert par une catégorie, la loupe ou le burger. Onglets des catégories, recherche, sous-catégories, produits -->
   <div data-overlay class="fixed inset-0 z-40 hidden bg-black/50"></div>
-  <aside data-drawer class="fixed inset-y-0 left-0 z-50 w-[88%] max-w-sm -translate-x-full overflow-y-auto bg-white transition-transform">
-    <button data-menu aria-label="Fermer" class="absolute right-3 top-3 text-2xl">×</button>
-    <form action="/boutique" class="p-5 pt-12"><input name="q" type="search" placeholder="BOUGIE, FONDANT…" class="w-full bg-creme px-4 py-3 text-sm" /></form>
-    <ul class="px-5 text-sm font-semibold uppercase">
-      {categories.map((c) => <li class="border-b border-lin py-3"><a href={`/boutique?categorie=${c.slug}`} class="flex justify-between">{c.name}<span>›</span></a>{c.subcategories.length > 0 && <ul class="mt-2 space-y-2 pl-3 font-normal normal-case">{c.subcategories.map((s) => <li><a href={`/boutique?categorie=${c.slug}&sous=${s.slug}`}>{s.name}</a></li>)}</ul>}</li>)}
-      <li class="py-3"><a href="/histoire">Notre histoire</a></li><li class="py-3"><a href="/contact">Contact</a></li>
-    </ul>
-    <div class="vichy m-5 p-5"><p class="h-title">Offrir Maison Allumette</p><p class="mt-1 font-serif text-sm italic">Une bougie faite main, c'est le cadeau qui réchauffe.</p></div>
+  <aside id="panneau" data-panneau role="dialog" aria-modal="true" aria-label="Menu de la boutique" inert class="fixed inset-y-0 left-0 z-50 flex w-[88%] max-w-md -translate-x-full bg-white shadow-xl transition-transform duration-300 lg:w-auto lg:max-w-none">
+    <div class="flex w-full flex-col overflow-y-auto lg:w-[30rem]">
+      <div class="flex items-start gap-3 border-b border-lin px-6 pb-3 pt-6">
+        <div class="flex flex-1 flex-wrap gap-x-5 gap-y-3 text-xs font-semibold uppercase tracking-wider">
+          {categories.map((c) => <button type="button" data-onglet={c.slug} aria-pressed="false" class="border-b-2 border-transparent pb-1 text-left uppercase aria-pressed:border-terracotta">{c.name}</button>)}
+        </div>
+        <button type="button" data-fermer aria-label="Fermer le menu" class="-mr-2 -mt-2 p-2 text-2xl leading-none">×</button>
+      </div>
+      <form action="/boutique" role="search" class="mx-6 mt-5 flex bg-creme">
+        <input data-recherche name="q" type="search" placeholder="Bougie, fondant, fleurs…" aria-label="Rechercher un produit" class="min-w-0 flex-1 bg-transparent px-4 py-3 text-base md:text-sm" />
+        <button aria-label="Lancer la recherche" class="px-3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-5"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button>
+      </form>
+      {categories.map((c) => {
+        const liste = produitsDe(c.slug);
+        return (
+          <div data-section={c.slug} hidden class="px-6 pt-3">
+            <ul class="divide-y divide-lin text-sm font-semibold uppercase tracking-wider">
+              {c.subcategories.length > 0
+                ? c.subcategories.map((s) => <li><a href={`/boutique?categorie=${c.slug}&sous=${s.slug}`} class={ligne}>{s.name}<span aria-hidden="true">›</span></a></li>)
+                : liste.map((p) => <li><a href={`/produits/${p.slug}`} class={ligne}>{p.name}<span aria-hidden="true">›</span></a></li>)}
+              <li><a href={`/boutique?categorie=${c.slug}`} class={`${ligne} normal-case tracking-normal underline underline-offset-4`}>Voir tout : {c.name}<span aria-hidden="true" class="inline-block">›</span></a></li>
+            </ul>
+            {liste.length === 0 && <p class="pb-2 font-serif italic">De nouvelles créations arrivent bientôt.</p>}
+          </div>
+        );
+      })}
+      <ul class="mx-6 mt-4 border-t border-lin pt-3 text-xs font-semibold uppercase tracking-wider">
+        <li><a href="/histoire" class="block py-2">Notre histoire</a></li>
+        <li><a href="/contact" class="block py-2">Contact</a></li>
+      </ul>
+      <div class="vichy m-6 mt-auto p-5"><div class="bg-creme/90 p-4"><p class="h-title">Offrir Maison Allumette</p><p class="mt-1 font-serif text-sm italic">Une bougie faite main, c'est le cadeau qui réchauffe.</p></div></div>
+    </div>
+    <!-- Sur grand écran : deux produits de la catégorie choisie -->
+    <div data-cote class="hidden w-80 flex-none overflow-y-auto border-l border-lin p-6">
+      {categories.map((c) => (
+        <div data-section={c.slug} hidden class="space-y-8">
+          {produitsDe(c.slug).slice(0, 2).map((p) => (
+            <a href={`/produits/${p.slug}`} class="block">
+              <PhotoCadree p={p} loading="lazy" />
+              <p class="h-title mt-3 text-sm">{p.name}</p>
+              <p class="mt-1 font-serif text-sm italic underline underline-offset-4">Découvrir</p>
+            </a>
+          ))}
+        </div>
+      ))}
+    </div>
   </aside>
 
   <main class={overlay ? "" : "pt-20"}><slot /></main>
@@ -88,12 +137,58 @@ const navOrdi = categories.slice(0, 5);
       document.querySelector('[data-cart-total]')!.textContent = eur(c.reduce((s, i) => s + i.qty * i.price, 0));
       document.querySelector('[data-cart-list]')!.replaceChildren(...(c.length ? c.map((i) => `${i.qty} × ${i.name}`) : ['Votre panier est vide']).map((t) => { const li = document.createElement('li'); li.textContent = t; return li; }));
     }
+    // Panneau du menu
+    const panneau = document.querySelector<HTMLElement>('[data-panneau]')!;
+    const voile = document.querySelector<HTMLElement>('[data-overlay]')!;
+    const cote = panneau.querySelector<HTMLElement>('[data-cote]')!;
+    const onglets = [...panneau.querySelectorAll<HTMLElement>('[data-onglet]')];
+    let ouvert = false, choisi = '', retour: HTMLElement | null = null;
+    function choisir(slug: string) {
+      choisi = slug;
+      onglets.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.onglet === slug)));
+      panneau.querySelectorAll<HTMLElement>('[data-section]').forEach((s) => (s.hidden = s.dataset.section !== slug));
+      // La colonne des photos n'apparaît que si la catégorie a des produits
+      cote.classList.toggle('lg:block', Boolean(cote.querySelector(`[data-section="${slug}"] a`)));
+    }
+    function ouvrir(slug: string, recherche = false) {
+      if (!ouvert) retour = document.activeElement as HTMLElement | null;
+      choisir(slug || choisi || onglets[0]?.dataset.onglet || '');
+      ouvert = true;
+      panneau.inert = false;
+      panneau.classList.remove('-translate-x-full');
+      voile.classList.remove('hidden');
+      document.documentElement.style.overflow = 'hidden';
+      const cible = recherche ? panneau.querySelector<HTMLElement>('[data-recherche]') : onglets.find((b) => b.dataset.onglet === choisi);
+      cible?.focus();
+    }
+    function fermer() {
+      if (!ouvert) return;
+      ouvert = false;
+      panneau.inert = true;
+      panneau.classList.add('-translate-x-full');
+      voile.classList.add('hidden');
+      document.documentElement.style.overflow = '';
+      retour?.focus();
+    }
+    document.addEventListener('keydown', (ev) => {
+      if (!ouvert) return;
+      if (ev.key === 'Escape') { fermer(); return; }
+      // La touche Tab reste dans le panneau tant qu'il est ouvert
+      if (ev.key !== 'Tab') return;
+      const liens = [...panneau.querySelectorAll<HTMLElement>('a[href], button, input')].filter((e) => e.offsetParent !== null);
+      const premier = liens[0], dernier = liens.at(-1);
+      if (ev.shiftKey && document.activeElement === premier) { ev.preventDefault(); dernier?.focus(); }
+      else if (!ev.shiftKey && document.activeElement === dernier) { ev.preventDefault(); premier?.focus(); }
+    });
     document.addEventListener('click', (ev) => {
       const t = ev.target as HTMLElement;
-      if (t.closest('[data-menu]') || t.closest('[data-overlay]')) {
-        document.querySelector('[data-drawer]')!.classList.toggle('-translate-x-full');
-        document.querySelector('[data-overlay]')!.classList.toggle('hidden'); return;
-      }
+      const cat = t.closest<HTMLElement>('[data-ouvre]');
+      if (cat) { ev.preventDefault(); ouvrir(cat.dataset.ouvre!); return; }
+      if (t.closest('[data-ouvre-recherche]')) { ev.preventDefault(); ouvrir('', true); return; }
+      if (t.closest('[data-menu]')) { ouvrir(''); return; }
+      if (t.closest('[data-fermer]') || t.closest('[data-overlay]')) { fermer(); return; }
+      const onglet = t.closest<HTMLElement>('[data-onglet]');
+      if (onglet) { choisir(onglet.dataset.onglet!); return; }
       const b = t.closest<HTMLElement>('[data-add]'); if (!b) return;
       const sel = document.querySelector<HTMLSelectElement>('[data-qty]');
       const n = b.hasAttribute('data-useqty') && sel ? Number(sel.value) : 1;

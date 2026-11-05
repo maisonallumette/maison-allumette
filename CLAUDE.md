@@ -10,7 +10,7 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 
 ## Fichiers clés
 - `src/styles/global.css` : thème provisoire (couleurs, polices), `.h-title`, `.vichy` (motif vichy), `.papier-peint` (larges bandes beiges sur crème), comportement de l'en-tête.
-- `src/layouts/Base.astro` : en-tête (transparent en haut, bandeau blanc après 90 px de défilement), tiroir mobile, newsletter, pied de page, panier en localStorage.
+- `src/layouts/Base.astro` : en-tête (transparent en haut, bandeau blanc après 90 px de défilement ; catégories à gauche, sauf la catégorie d'adresse `collections-capsules`, placée à droite avant la loupe et le panier), panneau du menu (ouvert par une catégorie, la loupe ou le burger : onglets des catégories, recherche, sous-catégories, deux produits sur grand écran), newsletter, pied de page, panier en localStorage.
 - `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit, barre d'achat fixe).
 - `src/components/ProductCard.astro`, `Seal.astro` (sceau officiel, crème et orange), `PhotoCadree.astro` (photo carrée avec le cadrage choisi dans l'admin : champ `cadrage` du produit, voir `src/data/cadrage.ts`).
 - `src/data/catalogue.json` : catégories, sous-catégories et produits (descriptions d'exemple à remplacer). Lu par `src/data/products.ts`, modifié depuis `/admin/`.
