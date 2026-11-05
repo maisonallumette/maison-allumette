@@ -14,7 +14,8 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 - `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit, barre d'achat fixe).
 - `src/components/ProductCard.astro`, `Seal.astro` (sceau officiel, crème et orange).
 - `src/data/catalogue.json` : catégories, sous-catégories et produits (descriptions d'exemple à remplacer). Lu par `src/data/products.ts`, modifié depuis `/admin/`.
-- `src/pages/admin/index.astro` + `src/scripts/admin.ts` : page admin sans serveur. Brouillon dans le navigateur, puis un seul commit sur `main` via l'API GitHub avec un jeton personnel que l'utilisateur colle (jamais dans le code).
+- `src/pages/admin/index.astro` + `src/scripts/admin.ts` : page admin avec identifiant et mot de passe. Brouillon dans le navigateur, puis un seul commit sur `main`.
+- `netlify/functions/` et `netlify/lib/acces.mjs` : connexion, session et écriture sur GitHub côté serveur. Variables Netlify : `ADMIN_IDENTIFIANT`, `ADMIN_MOT_DE_PASSE_EMPREINTE`, `ADMIN_SESSION_SECRET`, `ADMIN_GITHUB_JETON`. `npm run admin:acces` génère les trois premières (aussi pour changer le mot de passe, puis redéployer).
 
 ## Direction artistique
 - Inspiration de structure : fragonard.com (en-tête 3 zones, bandeau d'accueil coupé en deux, grille produits, fiche produit mobile avec barre d'achat fixe). Ne jamais copier leurs textes, images, logo ni code.

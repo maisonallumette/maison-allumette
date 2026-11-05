@@ -1,14 +1,10 @@
-// Page /admin/ : modifie le catalogue sans serveur.
+// Page /admin/ : modifie le catalogue.
 // Les changements restent dans un brouillon (IndexedDB) ; « Publier » les envoie en UN SEUL commit sur GitHub,
 // donc une seule publication Netlify, car ces publications sont comptées.
-// Le jeton GitHub n'est jamais dans le code : chacun colle le sien, il reste dans son navigateur.
+// La connexion et l'écriture sur GitHub passent par les fonctions de netlify/functions : le navigateur ne voit aucun secret.
 
-const REPO = 'maisonallumette/maison-allumette';
-const BRANCH = 'main';
-const CATALOGUE = 'src/data/catalogue.json';
-const API = `https://api.github.com/repos/${REPO}`;
-const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/public`;
-const CLE_JETON = 'ma-admin-jeton';
+const API = '/api/admin';
+const RAW = 'https://raw.githubusercontent.com/maisonallumette/maison-allumette/main/public';
 const DOSSIER_PHOTOS = '/images/produits/';
 const PHOTO_MAX = 1600;
 
@@ -20,7 +16,6 @@ type Catalogue = { categories: Category[]; products: Product[] };
 type Draft = { catalogue: Catalogue; files: Record<string, string | null>; baseSha: string; log: string[] };
 
 const racine = document.getElementById('admin')!;
-let jeton = localStorage.getItem(CLE_JETON) || '';
 let enLigne: Catalogue | null = null;
 let draft: Draft | null = null;
 let onglet: 'produits' | 'categories' = 'produits';
@@ -74,61 +69,49 @@ function dire(texte: string, erreur = false) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ---------- GitHub ---------- */
+/* ---------- Échanges avec le serveur ---------- */
 
-class ErreurGitHub extends Error { constructor(public status: number, texte: string) { super(texte); } }
+class ErreurApi extends Error { constructor(public status: number, texte: string) { super(texte); } }
 
-async function gh(chemin: string, init: RequestInit = {}) {
+async function api(chemin: string, corps?: unknown) {
   let r: Response;
   try {
-    r = await fetch(API + chemin, { ...init, cache: 'no-store', headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${jeton}`, ...(init.body ? { 'Content-Type': 'application/json' } : {}) } });
+    r = await fetch(API + chemin, corps === undefined ? { cache: 'no-store' } : { method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps) });
   } catch {
-    throw new ErreurGitHub(0, 'Impossible de joindre GitHub. Vérifiez votre connexion : vos brouillons sont conservés.');
+    throw new ErreurApi(0, 'Impossible de joindre le serveur. Vérifiez votre connexion : vos brouillons sont conservés.');
   }
-  if (r.ok) return r.json();
-  if (r.status === 401) throw new ErreurGitHub(401, 'Jeton refusé par GitHub : il est incorrect ou a expiré.');
-  if (r.status === 403 || r.status === 404) throw new ErreurGitHub(r.status, 'Ce jeton n’a pas le droit de modifier le site. Il doit donner accès au dépôt maison-allumette, avec « Contents » en lecture et écriture.');
-  throw new ErreurGitHub(r.status, `GitHub a répondu par une erreur (${r.status}).`);
+  const donnees = await r.json().catch(() => null);
+  if (r.ok && donnees) return donnees;
+  if (r.status === 429) throw new ErreurApi(429, 'Trop de tentatives : réessayez dans quelques minutes.');
+  throw new ErreurApi(r.status, donnees?.erreur || `Le serveur a répondu par une erreur (${r.status}).`);
 }
 
-const post = (chemin: string, corps: unknown) => gh(chemin, { method: 'POST', body: JSON.stringify(corps) });
-
-function decoder(base64: string) {
-  const octets = Uint8Array.from(atob(base64.replace(/\s/g, '')), (c) => c.charCodeAt(0));
-  return new TextDecoder().decode(octets);
-}
-
-async function lireCatalogue(ref: string): Promise<{ catalogue: Catalogue; sha: string }> {
-  const f = await gh(`/contents/${CATALOGUE}?ref=${ref}`);
-  return { catalogue: JSON.parse(decoder(f.content)), sha: f.sha };
-}
+const lireCatalogue = (): Promise<{ catalogue: Catalogue; sha: string }> => api('/catalogue');
 
 async function publier() {
   if (!draft || occupe) return;
   occupe = true; message = { texte: 'Publication en cours…', erreur: false }; afficher();
   try {
-    const tete = (await gh(`/git/ref/heads/${BRANCH}`)).object.sha;
-    const { sha } = await lireCatalogue(tete);
-    if (sha !== draft.baseSha) throw new ErreurGitHub(409, 'Le catalogue a changé en ligne depuis le début de vos modifications (autre appareil ?). Rien n’a été publié. Abandonnez vos brouillons pour repartir de la version en ligne.');
-    const arbreBase = (await gh(`/git/commits/${tete}`)).tree.sha;
-    const arbre: Record<string, unknown>[] = [{ path: CATALOGUE, mode: '100644', type: 'blob', content: JSON.stringify(draft.catalogue, null, 2) + '\n' }];
-    for (const [chemin, contenu] of Object.entries(draft.files)) {
-      const path = 'public' + chemin;
-      if (contenu === null) arbre.push({ path, mode: '100644', type: 'blob', sha: null });
-      else arbre.push({ path, mode: '100644', type: 'blob', sha: (await post('/git/blobs', { content: contenu, encoding: 'base64' })).sha });
+    const envois = Object.entries(draft.files);
+    const photos = envois.filter(([, contenu]) => contenu !== null);
+    const files: Record<string, string | null> = {};
+    let i = 0;
+    for (const [chemin, contenu] of envois) {
+      if (contenu === null) { files[chemin] = null; continue; }
+      message = { texte: `Envoi de la photo ${++i} sur ${photos.length}…`, erreur: false }; afficher();
+      files[chemin] = (await api('/photo', { contenu })).sha;
     }
-    const nouvelArbre = await post('/git/trees', { base_tree: arbreBase, tree: arbre });
-    const n = draft.log.length;
-    const commit = await post('/git/commits', { message: `Admin : met à jour le catalogue (${n} modification${n > 1 ? 's' : ''})\n\n${draft.log.map((l) => `- ${l}`).join('\n')}`, tree: nouvelArbre.sha, parents: [tete] });
-    await gh(`/git/refs/heads/${BRANCH}`, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha }) });
-    const frais = await lireCatalogue(commit.sha);
+    message = { texte: 'Publication en cours…', erreur: false }; afficher();
+    const frais = await api('/publier', { catalogue: draft.catalogue, files, baseSha: draft.baseSha, log: draft.log });
     enLigne = frais.catalogue;
     draft = { catalogue: JSON.parse(JSON.stringify(frais.catalogue)), files: {}, baseSha: frais.sha, log: [] };
     await viderBrouillon();
     edition = null;
     message = { texte: 'C’est publié ! Le site sera à jour dans une à deux minutes.', erreur: false };
   } catch (e) {
-    message = { texte: e instanceof ErreurGitHub ? (e.status === 422 ? 'Le site a changé pendant la publication. Rien n’a été publié : réessayez.' : e.message) : 'Erreur inattendue pendant la publication. Vos brouillons sont conservés.', erreur: true };
+    occupe = false;
+    if (e instanceof ErreurApi && e.status === 401) { sessionPerdue(); return; }
+    message = { texte: e instanceof ErreurApi ? e.message : 'Erreur inattendue pendant la publication. Vos brouillons sont conservés.', erreur: true };
   }
   occupe = false; afficher(); window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -168,7 +151,7 @@ async function abandonner() {
   occupe = true; afficher();
   try {
     await viderBrouillon();
-    const frais = await lireCatalogue(BRANCH);
+    const frais = await lireCatalogue();
     enLigne = frais.catalogue;
     draft = { catalogue: JSON.parse(JSON.stringify(frais.catalogue)), files: {}, baseSha: frais.sha, log: [] };
     edition = null; message = { texte: 'Brouillons abandonnés : vous voyez la version en ligne.', erreur: false };
@@ -209,48 +192,60 @@ function oublierPhoto(chemin: string, d: Draft) {
 /* ---------- Écrans ---------- */
 
 function ecranConnexion(erreur = '') {
+  const identifiant = h('input', { id: 'identifiant', required: true, autocomplete: 'username', autocapitalize: 'none', class: cn.champ });
+  const motDePasse = h('input', { id: 'mot-de-passe', type: 'password', required: true, autocomplete: 'current-password', class: cn.champ });
+  const bouton = h('button', { class: `${cn.btnPlein} mt-6 w-full` }, 'Se connecter');
+  const seConnecter = async (e: Event) => {
+    e.preventDefault();
+    bouton.disabled = true;
+    try {
+      await api('/connexion', { identifiant: identifiant.value.trim(), motDePasse: motDePasse.value });
+      await charger();
+    } catch (err) {
+      ecranConnexion((err as Error).message);
+    }
+  };
   remplacer(
     h('h1', { class: 'h-title text-2xl' }, 'Administration'),
-    h('p', { class: 'mt-4 text-sm/6' }, 'Pour modifier le catalogue, collez votre jeton GitHub. Il reste uniquement dans ce navigateur.'),
     erreur && h('p', { role: 'alert', class: 'mt-4 border border-terracotta bg-white p-3 text-sm' }, erreur),
-    h('form', { class: 'mt-4', onsubmit: (e: Event) => { e.preventDefault(); const v = (document.getElementById('jeton') as HTMLInputElement).value.trim(); if (v) connexion(v); } },
-      h('label', { for: 'jeton', class: cn.label }, 'Jeton GitHub'),
-      h('input', { id: 'jeton', type: 'password', required: true, autocomplete: 'off', class: cn.champ }),
-      h('button', { class: `${cn.btnPlein} mt-4 w-full` }, 'Se connecter')),
-    h('details', { class: 'mt-8 border-t border-lin py-4 text-sm/6' },
-      h('summary', { class: 'cursor-pointer font-semibold' }, 'Créer un jeton'),
-      h('ol', { class: 'mt-2 list-decimal space-y-1 pl-5' },
-        h('li', {}, 'Connectez-vous à GitHub avec le compte maisonallumette, puis ouvrez ', h('a', { class: 'underline', href: 'https://github.com/settings/personal-access-tokens/new', target: '_blank', rel: 'noopener' }, 'cette page'), '.'),
-        h('li', {}, 'Repository access : « Only select repositories », puis maison-allumette.'),
-        h('li', {}, 'Permissions : « Contents » sur « Read and write ».'),
-        h('li', {}, 'Générez le jeton et collez-le ici. Ne le partagez jamais.'))),
+    h('form', { class: 'mt-4', onsubmit: seConnecter },
+      h('label', { for: 'identifiant', class: cn.label }, 'Identifiant'), identifiant,
+      h('label', { for: 'mot-de-passe', class: cn.label }, 'Mot de passe'), motDePasse,
+      bouton),
   );
 }
 
-async function connexion(nouveau: string) {
-  jeton = nouveau;
+// Charge le catalogue : le serveur répond 401 s'il n'y a pas de session valide
+async function charger() {
   remplacer(h('p', { class: 'py-10 text-center text-sm' }, 'Chargement du catalogue…'));
   try {
-    const frais = await lireCatalogue(BRANCH);
+    const frais = await lireCatalogue();
     enLigne = frais.catalogue;
     const garde = await lireBrouillon().catch(() => undefined);
     draft = garde && garde.log.length ? garde : { catalogue: JSON.parse(JSON.stringify(frais.catalogue)), files: {}, baseSha: frais.sha, log: [] };
-    localStorage.setItem(CLE_JETON, jeton);
     if (garde && garde.log.length) message = { texte: 'Vos modifications non publiées ont été retrouvées.', erreur: false };
     afficher();
   } catch (e) {
-    const s = e instanceof ErreurGitHub ? e.status : -1;
-    if (s === 401) { localStorage.removeItem(CLE_JETON); jeton = ''; }
-    ecranConnexion((e as Error).message);
+    ecranConnexion(e instanceof ErreurApi && e.status === 401 ? '' : (e as Error).message);
   }
 }
 
-function deconnexion() {
+// Le brouillon est déjà sauvegardé : il sera retrouvé après la reconnexion
+function sessionPerdue() {
+  draft = null; enLigne = null; message = null; edition = null;
+  ecranConnexion('Votre session a expiré : reconnectez-vous. Vos brouillons sont conservés.');
+}
+
+async function deconnexion() {
   const reste = draft && draft.log.length ? ' Vos brouillons restent sur cet appareil.' : '';
   if (!confirm(`Se déconnecter ?${reste}`)) return;
-  localStorage.removeItem(CLE_JETON);
-  jeton = ''; draft = null; enLigne = null; message = null;
-  ecranConnexion();
+  try {
+    await api('/deconnexion', {});
+    draft = null; enLigne = null; message = null; edition = null;
+    ecranConnexion();
+  } catch (e) {
+    dire((e as Error).message, true);
+  }
 }
 
 function afficher() {
@@ -445,5 +440,5 @@ function ecranCategories() {
 
 /* ---------- Démarrage ---------- */
 
-if (jeton) connexion(jeton);
-else ecranConnexion();
+localStorage.removeItem('ma-admin-jeton'); // ancien jeton de la première version de cette page
+charger();
