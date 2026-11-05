@@ -15,9 +15,9 @@ const plus = 'text-lg font-normal leading-none transition-transform group-open:r
 ---
 <Base title={`${p.name} | Maison Allumette`} description={p.short} bandeau>
   <article class="md:grid md:grid-cols-2">
-    <!-- CADRE 2 : la photo -->
-    <div class="bg-white md:sticky md:top-20 md:flex md:h-[calc(100svh-5rem)] md:items-center md:justify-center md:p-10">
-      <div class="w-full md:max-w-[min(34rem,calc(100svh-10rem))]"><PhotoCadree p={p} /></div>
+    <!-- CADRE 2 : la photo, posée sur le lin olive de la marque (texture tirée d'un visuel de la graphiste) -->
+    <div class="bg-olive bg-[url(/images/fond-lin-olive.jpg)] bg-[length:880px] px-8 py-10 md:sticky md:top-20 md:flex md:h-[calc(100svh-5rem)] md:items-center md:justify-center md:p-10">
+      <div class="mx-auto w-full max-w-md shadow-[0_18px_40px_rgba(0,0,0,.45)] md:mx-0 md:max-w-[min(34rem,calc(100svh-10rem))]"><PhotoCadree p={p} /></div>
     </div>
 
     <!-- CADRE 3 : les informations -->

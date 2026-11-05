@@ -10,14 +10,15 @@ const champ = 'mt-1 w-full border border-lin bg-white px-3 py-3 text-base';
 const label = 'block text-xs font-semibold uppercase tracking-wider';
 const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold uppercase tracking-wider aria-pressed:border-terracotta';
 ---
-<Base title="Offrir Maison Allumette : la carte cadeau" description="La carte cadeau Maison Allumette, envoyée par la poste avec un petit mot écrit à la main, à utiliser sur le site en une ou plusieurs fois.">
-  <section class="md:grid md:min-h-[calc(100svh-5rem)] md:grid-cols-2">
+<Base title="Offrir Maison Allumette : la carte cadeau" description="La carte cadeau Maison Allumette, envoyée par la poste avec un petit mot écrit à la main, à utiliser sur le site en une ou plusieurs fois." bandeau>
+  <!-- Trois cadres, comme les fiches produit : bandeau blanc en haut, carte à gauche (fixe pendant le défilement), formulaire à droite -->
+  <section class="md:grid md:grid-cols-2">
     <!-- La carte, dessinée aux couleurs de la maison -->
-    <div class="vichy flex items-center justify-center overflow-hidden px-6 py-14 md:py-20">
+    <div class="vichy flex items-center justify-center overflow-hidden px-6 py-14 md:sticky md:top-20 md:h-[calc(100svh-5rem)] md:p-10">
       <CarteCadeau class="max-w-md" />
     </div>
 
-    <div class="px-5 py-10 md:px-10 lg:px-16">
+    <div class="px-5 py-10 md:min-h-[calc(100svh-5rem)] md:px-10 md:py-16 lg:px-16">
       <div class="mx-auto max-w-lg">
         <div class="flex justify-center gap-8">
           <button type="button" data-onglet="offrir" aria-pressed="true" class={onglet}>J'offre une carte</button>
