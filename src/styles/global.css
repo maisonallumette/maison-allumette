@@ -1,31 +1,37 @@
 @import "tailwindcss";
-/* ===== THÈME PROVISOIRE : couleurs relevées sur captures, à remplacer par le guide de marque de Camille Lacroix ===== */
+/* ===== PALETTE OFFICIELLE relevée sur les sceaux de Camille Lacroix. Polices encore provisoires. ===== */
 @theme {
-  --color-olive: #3d4130;
-  --color-sauge: #9a9b80;
-  --color-lin: #d9cfba;
-  --color-creme: #f6f1e7;
-  --color-terracotta: #d4532b;
-  --color-cuivre: #b0826a;
+  --color-olive: #3b402c;
+  --color-sauge: #92917d;
+  --color-lin: #ddd4c3;
+  --color-creme: #f1e7db;
+  --color-terracotta: #d85624;
+  --color-cuivre: #a07d5f;
+  --color-or: #d9ae79;
   --color-encre: #2a2b22;
   --font-script: "Pinyon Script", cursive;
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-sans: "Montserrat", system-ui, sans-serif;
 }
 .h-title { font-family: var(--font-serif); text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
-.vichy { background-color: #f1ead9;
-  background-image: linear-gradient(90deg, rgba(160,140,100,.22) 50%, transparent 50%), linear-gradient(rgba(160,140,100,.22) 50%, transparent 50%);
+.vichy { background-color: var(--color-creme);
+  background-image: linear-gradient(90deg, color-mix(in srgb, var(--color-cuivre) 22%, transparent) 50%, transparent 50%), linear-gradient(color-mix(in srgb, var(--color-cuivre) 22%, transparent) 50%, transparent 50%);
   background-size: 28px 28px; }
+
+/* Logos noirs de la graphiste, recolorés par masque : ils prennent la couleur du texte (currentColor) */
+.logo-ronde, .logo-ovale { display: block; background-color: currentColor; -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat; }
+.logo-ronde { --logo: url("/brand/ma-tampon-ronde.svg"); aspect-ratio: 1; }
+.logo-ovale { --logo: url("/brand/ma-tampon-ovale.svg"); aspect-ratio: 224 / 265; }
 
 /* Papier peint cottage : larges bandes beiges sur fond crème (ajuster largeur/couleurs ici) */
 .papier-peint {
-  background-color: #f6f1e7;
-  background-image: repeating-linear-gradient(90deg, #f6f1e7 0 56px, #e9dfca 56px 112px);
+  background-color: var(--color-creme);
+  background-image: repeating-linear-gradient(90deg, var(--color-creme) 0 56px, var(--color-lin) 56px 112px);
 }
 
 /* En-tête : transparent en haut, bandeau blanc après avoir dépassé le logo (seuil de 90 px réglable dans Base.astro) */
 header.site { background: transparent; border-bottom: 1px solid transparent; transition: background-color .3s, border-color .3s; }
-header.site.is-scrolled { background: #fff; border-bottom-color: #d9cfba; }
+header.site.is-scrolled { background: #fff; border-bottom-color: var(--color-lin); }
 header.site .logo-wrap { transition: transform .3s; transform-origin: center top; }
 header.site:not(.is-scrolled) .logo-wrap { transform: scale(1.1); }
 @media (min-width: 48rem) { header.site:not(.is-scrolled) .logo-wrap { transform: scale(1.35); } }
