@@ -1,0 +1,58 @@
+---
+// Notre histoire : Adeline et la fabrication, racontées par les photos de l'atelier.
+import Base from '../layouts/Base.astro';
+import Seal from '../components/Seal.astro';
+const etapes = [
+  ['atelier-cire', 'Fondre la cire', 'La cire végétale fond doucement, surveillée au thermomètre jusqu’à la bonne température.', 'Adeline mesure la température de la cire au thermomètre'],
+  ['atelier-parfum', 'Parfumer', 'Le parfum est ajouté à la main, dosé pour chaque création.', 'Adeline verse le parfum dans la cire'],
+  ['atelier-coulage', 'Couler', 'La cire parfumée est coulée à la main, dans les pots comme dans les moules à fondants.', 'La cire versée dans des moules à fondants, devant des bougies en pot'],
+  ['atelier-fleurs', 'Fleurir', 'Les fleurs séchées sont posées une à une : aucune bougie n’est tout à fait pareille.', 'Des fleurs séchées posées une à une sur une bougie'],
+  ['atelier-fondants', 'Décorer', 'Fondants et tablettes parfumées reçoivent eux aussi leurs fleurs, à la pince.', 'Adeline décore des tablettes parfumées de fleurs séchées'],
+];
+---
+<Base title="Notre histoire | Maison Allumette" description="Maison Allumette, ce sont des bougies fleuries, fondants et parfums d’intérieur faits main par Adeline, dans son atelier des Landes." bandeau>
+  <!-- Trois cadres, comme les fiches produit : bandeau blanc, photo à gauche, texte à droite -->
+  <section class="md:grid md:grid-cols-2">
+    <div class="md:sticky md:top-20 md:h-[calc(100svh-5rem)]">
+      <img src="/images/atelier/atelier-sourire.jpg" alt="Adeline, souriante, décore des tablettes parfumées dans son atelier" class="aspect-[4/5] w-full object-cover md:aspect-auto md:h-full" />
+    </div>
+    <div class="bg-creme px-5 py-12 md:flex md:min-h-[calc(100svh-5rem)] md:flex-col md:justify-center md:px-12 lg:px-20">
+      <p class="text-[11px] font-semibold uppercase tracking-[.3em]">Notre histoire</p>
+      <h1 class="h-title mt-3 text-3xl leading-tight md:text-4xl">Réchauffez vos intérieurs</h1>
+      <p class="mt-6 font-serif text-xl italic">Maison Allumette, ce sont des bougies fleuries, des fondants et des parfums d’intérieur faits main par Adeline, dans son atelier des Landes.</p>
+      <p class="mt-4 text-sm/6">Chaque création passe entre ses mains, de la cire qui fond aux dernières fleurs séchées posées à la pince.</p>
+      <Seal class="mt-8 w-28" />
+    </div>
+  </section>
+
+  <!-- LA FABRICATION, ÉTAPE PAR ÉTAPE -->
+  <section class="mx-auto max-w-6xl px-4 py-16 md:py-20">
+    <h2 class="h-title text-center text-2xl md:text-3xl">De la cire à la bougie</h2>
+    <ol class="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
+      {etapes.map(([photo, titre, texte, alt], i) => (
+        <li>
+          <img src={`/images/atelier/${photo}.jpg`} alt={alt} loading="lazy" class="aspect-[4/5] w-full object-cover" />
+          <p class="mt-4 font-serif text-sm italic text-cuivre">Étape {i + 1}</p>
+          <h3 class="h-title mt-1 text-lg">{titre}</h3>
+          <p class="mt-2 text-sm/6">{texte}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- L'ATELIER -->
+  <section class="bg-white/80 px-4 py-16 md:py-20">
+    <div class="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2 md:gap-12">
+      <img src="/images/atelier/atelier-table.jpg" alt="La table de l'atelier couverte de bougies en pot, pendant le coulage" loading="lazy" class="aspect-[4/5] w-full object-cover" />
+      <div class="text-center md:text-left">
+        <p class="text-[11px] font-semibold uppercase tracking-[.3em]">Homemade in Landes</p>
+        <h2 class="h-title mt-3 text-2xl md:text-3xl">Fait main, en petites séries</h2>
+        <p class="mt-4 font-serif text-lg italic">Des créations pensées pour les intérieurs qu’on aime retrouver : chaudes, fleuries, un peu cottage.</p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center md:justify-start">
+          <a href="/boutique" class="bg-olive px-8 py-3 text-center text-xs font-semibold uppercase tracking-wider text-creme transition hover:bg-encre">Voir nos créations</a>
+          <a href="/pop-up-store" class="border border-olive bg-white px-8 py-3 text-center text-xs font-semibold uppercase tracking-wider transition hover:bg-olive hover:text-creme">Nous rencontrer au Pop-Up</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

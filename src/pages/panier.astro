@@ -1,0 +1,217 @@
+---
+// Panier complet : quantités, coordonnées, lieu de retrait, carte cadeau à utiliser, puis paiement Stripe.
+// Les prix affichés viennent du catalogue publié ; le serveur les recalcule de toute façon.
+import Base from '../layouts/Base.astro';
+import { products } from '../data/products';
+import { CARTE_CADEAU, MENTION_TVA, POPUP, RETRAIT, VENTE_EN_LIGNE } from '../data/site';
+import { styleCadrage } from '../data/cadrage';
+
+const catalogue = Object.fromEntries(products.map((p) => [p.slug, { nom: p.name, prix: p.price, image: p.image, style: styleCadrage(p.cadrage) }]));
+const reglages = { popup: POPUP, retrait: RETRAIT, envoiPostal: CARTE_CADEAU.envoiPostal };
+const champ = 'mt-1 w-full border border-lin bg-white px-3 py-3 text-base';
+const label = 'block text-xs font-semibold uppercase tracking-wider';
+---
+<Base title="Mon panier | Maison Allumette" bandeau>
+  <section class="mx-auto max-w-5xl px-4 py-10 md:py-14">
+    <h1 class="h-title text-3xl">Mon panier</h1>
+
+    {!VENTE_EN_LIGNE ? (
+      <div class="mt-8 border border-olive bg-white/90 p-6 text-center">
+        <p class="h-title text-sm">Bientôt sur le site</p>
+        <p class="mt-3 text-sm/6">La commande en ligne arrive prochainement. En attendant, retrouvez nos créations au Pop-Up Store de Mont-de-Marsan.</p>
+        <a href="/pop-up-store" class="mt-6 inline-block bg-olive px-8 py-3 text-xs font-semibold uppercase tracking-wider text-creme">Découvrir le Pop-Up Store</a>
+      </div>
+    ) : (
+      <div data-panier data-catalogue={JSON.stringify(catalogue)} data-reglages={JSON.stringify(reglages)}>
+        <div data-vide hidden class="mt-8 border border-lin bg-white/90 p-6 text-center">
+          <p class="font-serif text-lg italic">Votre panier est vide.</p>
+          <a href="/boutique" class="mt-6 inline-block bg-olive px-8 py-3 text-xs font-semibold uppercase tracking-wider text-creme">Voir nos créations</a>
+        </div>
+
+        <form data-formulaire hidden novalidate class="mt-8 grid gap-10 md:grid-cols-[3fr_2fr]">
+          <div>
+            <ul data-lignes class="divide-y divide-lin border-y border-lin"></ul>
+
+            <h2 class="h-title mt-10 text-lg">Retrait gratuit</h2>
+            <div class="mt-3 border border-lin bg-white/90 p-4 text-sm/6">
+              <p data-lieu class="font-semibold"></p>
+              <p class="mt-1">Nous vous prévenons par e-mail ou par téléphone dès que votre commande est prête.</p>
+            </div>
+
+            <h2 class="h-title mt-10 text-lg">Vos coordonnées</h2>
+            <div class="mt-3 space-y-4">
+              <div><label for="p-nom" class={label}>Prénom et nom</label><input id="p-nom" name="nom" autocomplete="name" required maxlength="80" class={champ} /></div>
+              <div><label for="p-email" class={label}>E-mail</label><input id="p-email" name="email" type="email" autocomplete="email" required maxlength="120" class={champ} /></div>
+              <div><label for="p-tel" class={label}>Téléphone</label><input id="p-tel" name="telephone" type="tel" autocomplete="tel" required maxlength="30" class={champ} /></div>
+            </div>
+          </div>
+
+          <aside class="md:sticky md:top-28 md:self-start">
+            <div class="border border-lin bg-white/90 p-5">
+              <h2 class="h-title text-lg">Récapitulatif</h2>
+              <dl data-recap class="mt-4 space-y-2 text-sm"></dl>
+              <p class="mt-2 text-xs text-encre/70">{MENTION_TVA}.</p>
+
+              <details data-bloc-code class="mt-5 border-t border-lin pt-4">
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Vous avez une carte cadeau ?</summary>
+                <div class="mt-3 flex gap-2">
+                  <label for="p-code" class="sr-only">Code de la carte cadeau</label>
+                  <input id="p-code" placeholder="MA-XXXX-XXXX" autocomplete="off" autocapitalize="characters" class="min-w-0 flex-1 border border-lin bg-white px-3 py-2 text-base uppercase" />
+                  <button type="button" data-verifier class="border border-olive bg-white px-3 text-xs font-semibold uppercase tracking-wider">Utiliser</button>
+                </div>
+                <p data-code-info aria-live="polite" class="mt-2 text-sm"></p>
+                <p class="mt-1 text-xs text-encre/70">La carte cadeau se déduit de vos créations (pas d’autres cartes cadeaux). Ce qui reste sur la carte est conservé.</p>
+              </details>
+
+              <label class="mt-5 flex items-start gap-2 text-sm"><input type="checkbox" data-cgv class="mt-1 accent-olive" /> <span>J’ai lu et j’accepte les <a href="/cgv" class="underline" target="_blank">conditions générales de vente</a>.</span></label>
+              <p data-erreur role="alert" hidden class="mt-4 border border-terracotta bg-white p-3 text-sm"></p>
+              <button data-payer class="mt-5 w-full bg-olive py-4 text-xs font-semibold uppercase tracking-wider text-creme disabled:opacity-50">Payer</button>
+              <p class="mt-3 text-center text-xs text-encre/70">Paiement sécurisé par Stripe : vos coordonnées bancaires ne passent jamais par notre site.</p>
+            </div>
+          </aside>
+        </form>
+      </div>
+    )}
+  </section>
+
+  <script>
+    type Ligne = { id: string; name: string; price: number; qty: number; details?: Record<string, string> };
+    const racine = document.querySelector<HTMLElement>('[data-panier]');
+    if (racine) {
+      const CLE = 'ma-cart';
+      const catalogue: Record<string, { nom: string; prix: number; image: string; style: string }> = JSON.parse(racine.dataset.catalogue!);
+      const reglages = JSON.parse(racine.dataset.reglages!);
+      const form = racine.querySelector<HTMLFormElement>('[data-formulaire]')!;
+      const erreur = racine.querySelector<HTMLElement>('[data-erreur]')!;
+      const payer = racine.querySelector<HTMLButtonElement>('[data-payer]')!;
+      const eur = (c: number) => (c / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+      const centimes = (e: number) => Math.round(e * 100);
+      const estCarte = (l: Ligne) => l.id.startsWith('carte-cadeau-');
+      let carte: { code: string; solde: number } | null = null;
+
+      const lire = (): Ligne[] => { try { return JSON.parse(localStorage.getItem(CLE) || '[]'); } catch { return []; } };
+      const ecrire = (l: Ligne[]) => { localStorage.setItem(CLE, JSON.stringify(l)); window.dispatchEvent(new Event('panier-change')); };
+      // Les articles retirés du catalogue disparaissent, les prix suivent le catalogue publié
+      const lignes = () => lire().filter((l) => estCarte(l) || catalogue[l.id]).map((l) => (estCarte(l) ? l : { ...l, name: catalogue[l.id].nom, price: catalogue[l.id].prix }));
+
+      // Même règle que le serveur : Pop-Up Store pendant son ouverture, Atelier Cruchon le reste de l'année
+      const maintenant = Date.now();
+      const lieu = maintenant >= Date.parse(reglages.popup.ouverture) && maintenant < Date.parse(reglages.popup.fermeture) ? reglages.retrait.popup : reglages.retrait.atelier;
+      racine.querySelector('[data-lieu]')!.textContent = lieu.adresse ? `${lieu.nom}, ${lieu.adresse}` : lieu.nom;
+
+      function el<K extends keyof HTMLElementTagNameMap>(tag: K, classe = '', texte = '') { const e = document.createElement(tag); if (classe) e.className = classe; if (texte) e.textContent = texte; return e; }
+
+      function totaux(ls: Ligne[]) {
+        const creations = ls.filter((l) => !estCarte(l)).reduce((s, l) => s + centimes(l.price) * l.qty, 0);
+        const cartes = ls.filter(estCarte).reduce((s, l) => s + centimes(l.price), 0);
+        const envoi = ls.filter((l) => estCarte(l) && l.details?.remise === 'poste').length * centimes(reglages.envoiPostal);
+        let total = creations + cartes + envoi, deduit = 0;
+        if (carte) {
+          deduit = Math.min(carte.solde, creations);
+          const reste = total - deduit;
+          if (reste > 0 && reste < 50) deduit -= 50 - reste;
+          deduit = Math.max(0, deduit);
+          total -= deduit;
+        }
+        return { creations, cartes, envoi, deduit, total };
+      }
+
+      function afficher() {
+        const ls = lignes();
+        racine!.querySelector<HTMLElement>('[data-vide]')!.hidden = ls.length > 0;
+        form.hidden = ls.length === 0;
+        const liste = racine!.querySelector('[data-lignes]')!;
+        liste.replaceChildren(...ls.map((l, i) => {
+          const li = el('li', 'flex gap-4 py-4');
+          if (estCarte(l)) {
+            li.append(el('div', 'flex size-20 flex-none items-center justify-center rounded-lg bg-olive font-serif text-xs italic text-creme', 'Carte cadeau'));
+          } else {
+            const cadre = el('div', 'relative size-20 flex-none overflow-hidden bg-lin');
+            const img = el('img', 'absolute inset-0 size-full object-cover') as HTMLImageElement;
+            img.src = catalogue[l.id].image; img.alt = ''; img.setAttribute('style', catalogue[l.id].style);
+            cadre.append(img); li.append(cadre);
+          }
+          const infos = el('div', 'min-w-0 flex-1');
+          infos.append(el('p', 'h-title text-sm', l.name));
+          if (estCarte(l)) {
+            const d = l.details ?? {};
+            infos.append(el('p', 'mt-1 text-xs', d.remise === 'poste' ? `Envoyée par la poste à ${d.prenom} ${d.nom}, ${d.adresse}, ${d.cp} ${d.ville}` : `À retirer avec votre commande, pour ${d.prenom} ${d.nom}`));
+            infos.append(el('p', 'mt-1 font-serif text-sm italic', `« ${d.mot} » — ${d.de}`));
+          } else {
+            const qte = el('select', 'mt-2 border border-lin bg-white px-2 py-1 text-sm') as HTMLSelectElement;
+            qte.setAttribute('aria-label', `Quantité : ${l.name}`);
+            for (let n = 1; n <= 20; n++) qte.append(new Option(String(n), String(n), false, n === l.qty));
+            qte.addEventListener('change', () => { const t = lire(); const x = t.find((y) => y.id === l.id); if (x) x.qty = Number(qte.value); ecrire(t); afficher(); });
+            infos.append(qte);
+          }
+          const droite = el('div', 'text-right');
+          droite.append(el('p', 'text-sm font-semibold', eur(centimes(l.price) * (estCarte(l) ? 1 : l.qty))));
+          const retirer = el('button', 'mt-2 text-xs underline', 'Retirer') as HTMLButtonElement;
+          retirer.type = 'button';
+          retirer.setAttribute('aria-label', `Retirer ${l.name}`);
+          retirer.addEventListener('click', () => { ecrire(lire().filter((x) => x.id !== l.id)); afficher(); });
+          droite.append(retirer);
+          li.append(infos, droite);
+          return li;
+        }));
+        const t = totaux(ls);
+        const ligneRecap = (nom: string, valeur: string, fort = false) => { const d = el('div', `flex justify-between gap-4 ${fort ? 'border-t border-lin pt-2 text-base font-semibold' : ''}`); d.append(el('dt', '', nom), el('dd', '', valeur)); return d; };
+        racine!.querySelector('[data-recap]')!.replaceChildren(
+          ...(t.creations ? [ligneRecap('Créations', eur(t.creations))] : []),
+          ...(t.cartes ? [ligneRecap('Cartes cadeaux', eur(t.cartes))] : []),
+          ...(t.envoi ? [ligneRecap('Envoi postal', eur(t.envoi))] : []),
+          ligneRecap('Retrait', 'Gratuit'),
+          ...(t.deduit ? [ligneRecap(`Carte ${carte!.code}`, `− ${eur(t.deduit)}`)] : []),
+          ligneRecap('Total', eur(t.total), true),
+        );
+        payer.textContent = t.total === 0 ? 'Valider ma commande' : `Payer ${eur(t.total)}`;
+      }
+
+      const info = racine.querySelector<HTMLElement>('[data-code-info]')!;
+      racine.querySelector('[data-verifier]')!.addEventListener('click', async () => {
+        const code = racine.querySelector<HTMLInputElement>('#p-code')!.value;
+        info.textContent = 'Vérification…';
+        try {
+          const r = await fetch('/api/carte-cadeau', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+          const j = await r.json().catch(() => ({}));
+          if (r.status === 429) { info.textContent = 'Trop d’essais : réessayez dans quelques minutes.'; return; }
+          if (!r.ok) { carte = null; info.textContent = j.erreur || 'Code introuvable.'; afficher(); return; }
+          if (j.solde <= 0) { carte = null; info.textContent = 'Cette carte est entièrement utilisée.'; afficher(); return; }
+          carte = { code: j.code, solde: j.solde };
+          info.textContent = `Carte ${j.code} : solde de ${eur(j.solde)}.`;
+          afficher();
+        } catch { info.textContent = 'Impossible de vérifier pour le moment.'; }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        erreur.hidden = true;
+        const v = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value.trim();
+        const manque = !v('nom') ? '#p-nom' : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email')) ? '#p-email' : !v('telephone') ? '#p-tel' : '';
+        if (manque) { erreur.textContent = 'Indiquez votre nom, une adresse e-mail valide et votre téléphone, pour que nous puissions vous prévenir.'; erreur.hidden = false; form.querySelector<HTMLElement>(manque)!.focus(); return; }
+        if (!racine.querySelector<HTMLInputElement>('[data-cgv]')!.checked) { erreur.textContent = 'Merci d’accepter les conditions générales de vente.'; erreur.hidden = false; return; }
+        const ls = lignes();
+        payer.disabled = true; payer.textContent = 'Un instant…';
+        try {
+          const r = await fetch('/api/commande', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              client: { nom: v('nom'), email: v('email'), telephone: v('telephone') }, cgv: true, code: carte?.code,
+              articles: ls.filter((l) => !estCarte(l)).map((l) => ({ slug: l.id, qte: l.qty })),
+              cartes: ls.filter(estCarte).map((l) => ({ montant: l.price, ...l.details })),
+            }),
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || !j.url) throw new Error(r.status === 429 ? 'Trop de tentatives : réessayez dans une minute.' : j.erreur || 'Le paiement n’a pas pu être préparé.');
+          location.href = j.url;
+        } catch (err) {
+          erreur.textContent = (err as Error).message; erreur.hidden = false;
+          payer.disabled = false; afficher();
+        }
+      });
+
+      afficher();
+      window.addEventListener('pageshow', () => { payer.disabled = false; afficher(); });
+    }
+  </script>
+</Base>

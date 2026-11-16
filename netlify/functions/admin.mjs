@@ -1,6 +1,7 @@
 // Actions de la page admin, réservées à une session valide. Le jeton GitHub reste ici, côté serveur.
 // Seuls le catalogue et les photos de produits peuvent être écrits : jamais le code du site.
 import { cookieEfface, memeOrigine, reponse, sessionValide } from '../lib/acces.mjs';
+import { cartes, commandes } from '../lib/boutique.mjs';
 
 const API = 'https://api.github.com/repos/maisonallumette/maison-allumette';
 const BRANCHE = 'main';
@@ -126,10 +127,39 @@ async function publier(req) {
   return reponse(await lireCatalogue(commit.sha));
 }
 
+/* ---------- Commandes et cartes cadeaux (boutique en ligne) ---------- */
+
+// Les identifiants commencent par la date : l'ordre alphabétique inverse donne les plus récentes d'abord
+async function lireTout(store, max = 300) {
+  const { blobs } = await store.list();
+  const cles = blobs.map((b) => b.key).sort().reverse().slice(0, max);
+  return (await Promise.all(cles.map((k) => store.get(k, { type: 'json' })))).filter(Boolean);
+}
+
+async function listerCommandes() {
+  const toutes = await lireTout(commandes());
+  // Les paiements jamais terminés ne sont pas des commandes : on ne les montre pas
+  const utiles = toutes.filter((c) => c.statut === 'payee' || c.statut === 'retiree');
+  const cartesCadeaux = (await lireTout(cartes())).sort((a, b) => b.creeLe.localeCompare(a.creeLe));
+  return reponse({ commandes: utiles, cartes: cartesCadeaux });
+}
+
+async function changerStatut(req) {
+  const { id, statut } = await req.json();
+  if (typeof id !== 'string' || !['payee', 'retiree'].includes(statut)) throw new ErreurHttp(400, 'Requête invalide.');
+  for (let essai = 0; essai < 3; essai++) {
+    const lu = await commandes().getWithMetadata(id, { type: 'json' });
+    if (!lu?.data || !['payee', 'retiree'].includes(lu.data.statut)) throw new ErreurHttp(404, 'Commande introuvable.');
+    const r = await commandes().setJSON(id, { ...lu.data, statut, retireeLe: statut === 'retiree' ? new Date().toISOString() : undefined }, { onlyIfMatch: lu.etag });
+    if (r.modified) return reponse({ ok: true });
+  }
+  throw new ErreurHttp(409, 'La commande vient d’être modifiée : rechargez la page.');
+}
+
 export default async (req) => {
   const action = new URL(req.url).pathname.split('/').pop();
   const ecriture = req.method === 'POST';
-  if (!ecriture && !(req.method === 'GET' && action === 'catalogue')) return reponse({ erreur: 'Méthode non autorisée.' }, 405);
+  if (!ecriture && !(req.method === 'GET' && (action === 'catalogue' || action === 'commandes'))) return reponse({ erreur: 'Méthode non autorisée.' }, 405);
   if (ecriture && !memeOrigine(req)) return reponse({ erreur: 'Origine refusée.' }, 403);
   if (action === 'deconnexion') return reponse({ ok: true }, 200, { 'Set-Cookie': cookieEfface() });
   if (!sessionValide(req)) return reponse({ erreur: 'Session expirée : reconnectez-vous.' }, 401);
@@ -137,6 +167,8 @@ export default async (req) => {
     if (action === 'catalogue') return reponse(await lireCatalogue(BRANCHE));
     if (action === 'photo') return await envoyerPhoto(req);
     if (action === 'publier') return await publier(req);
+    if (action === 'commandes') return await listerCommandes();
+    if (action === 'commande-statut') return await changerStatut(req);
     return reponse({ erreur: 'Action inconnue.' }, 404);
   } catch (e) {
     if (e instanceof ErreurHttp) return reponse({ erreur: e.message }, e.status);
@@ -147,5 +179,5 @@ export default async (req) => {
 };
 
 export const config = {
-  path: ['/api/admin/deconnexion', '/api/admin/catalogue', '/api/admin/photo', '/api/admin/publier'],
+  path: ['/api/admin/deconnexion', '/api/admin/catalogue', '/api/admin/photo', '/api/admin/publier', '/api/admin/commandes', '/api/admin/commande-statut'],
 };

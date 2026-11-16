@@ -1,17 +1,17 @@
 ---
-// Carte cadeau envoyée par la poste avec un petit mot écrit à la main.
-// À BRANCHER avec le paiement : création du code, suivi du solde, utilisation en une ou plusieurs fois.
+// Carte cadeau avec un petit mot écrit à la main : retirée avec la commande ou envoyée par la poste.
+// Le code est créé après le paiement (netlify/functions/stripe-webhook.mjs), le solde est gardé sur le serveur.
 import Base from '../layouts/Base.astro';
 import CarteCadeau from '../components/CarteCadeau.astro';
-import { VENTE_EN_LIGNE } from '../data/site';
-const MIN = 15, MAX = 200; // montants acceptés, à ajuster
+import { CARTE_CADEAU, VENTE_EN_LIGNE } from '../data/site';
+const { min: MIN, max: MAX, envoiPostal } = CARTE_CADEAU; // montants acceptés : src/data/site.json
 const MONTANTS = [20, 30, 50, 80];
 const MOT_MAX = 200;
 const champ = 'mt-1 w-full border border-lin bg-white px-3 py-3 text-base';
 const label = 'block text-xs font-semibold uppercase tracking-wider';
 const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold uppercase tracking-wider aria-pressed:border-terracotta';
 ---
-<Base title="Offrir Maison Allumette : la carte cadeau" description="La carte cadeau Maison Allumette, envoyée par la poste avec un petit mot écrit à la main, à utiliser sur le site en une ou plusieurs fois." bandeau>
+<Base title="Offrir Maison Allumette : la carte cadeau" description="La carte cadeau Maison Allumette, avec un petit mot écrit à la main, à utiliser sur le site en une ou plusieurs fois." bandeau>
   <!-- Trois cadres, comme les fiches produit : bandeau blanc en haut, carte à gauche (fixe pendant le défilement), formulaire à droite -->
   <section class="md:grid md:grid-cols-2">
     <!-- La carte, dessinée aux couleurs de la maison -->
@@ -49,7 +49,13 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
                 </div>
               </fieldset>
     
-              <fieldset class="space-y-4">
+              <fieldset class="space-y-3">
+                <legend class={label}>Comment la remettre ?</legend>
+                <label class="mt-2 flex items-start gap-2 text-sm"><input type="radio" name="remise" value="retrait" checked class="mt-1 accent-olive" /> <span>Je la retire avec ma commande (gratuit)</span></label>
+                <label class="flex items-start gap-2 text-sm"><input type="radio" name="remise" value="poste" class="mt-1 accent-olive" /> <span>Envoyée par la poste à la personne{envoiPostal > 0 ? ` (+ ${envoiPostal.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })})` : ' (envoi offert)'}</span></label>
+              </fieldset>
+
+              <fieldset data-adresse hidden class="space-y-4">
                 <legend class={label}>Où l'envoyer ?</legend>
                 <div><label for="cc-adresse" class="text-sm">Adresse</label><input id="cc-adresse" name="adresse" required autocomplete="off" class={champ} /></div>
                 <div class="grid grid-cols-[2fr_3fr] gap-3">
@@ -77,8 +83,14 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
     
             <!-- J'AI UNE CARTE -->
             <div data-section="utiliser" hidden class="mt-8 space-y-4 text-sm/6">
-              <p>Le code de votre carte est inscrit au dos, sous le petit mot.</p>
-              <p>Saisissez-le au moment de valider votre commande : son montant est déduit de votre panier. Vous pouvez l'utiliser en une ou plusieurs fois, ce qui n'est pas dépensé reste sur la carte pour la prochaine commande.</p>
+              <p>Le code de votre carte (MA-XXXX-XXXX) est inscrit au dos, sous le petit mot.</p>
+              <p>Saisissez-le dans votre panier, au moment de valider votre commande : son montant est déduit de vos créations. Vous pouvez l'utiliser en une ou plusieurs fois, ce qui n'est pas dépensé reste sur la carte pour la prochaine commande.</p>
+              <form data-solde class="flex gap-2 pt-2">
+                <label for="cc-code" class="sr-only">Code de la carte cadeau</label>
+                <input id="cc-code" placeholder="MA-XXXX-XXXX" autocomplete="off" autocapitalize="characters" class="min-w-0 flex-1 border border-lin bg-white px-3 py-3 text-base uppercase" />
+                <button class="bg-olive px-4 text-xs font-semibold uppercase tracking-wider text-creme">Voir le solde</button>
+              </form>
+              <p data-solde-info aria-live="polite" class="font-semibold"></p>
               <a href="/boutique" class="mt-2 block border border-olive py-3 text-center text-xs font-semibold uppercase tracking-wider">Découvrir la boutique</a>
             </div>
           </>
@@ -101,7 +113,7 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
     <h2 class="h-title text-center text-xl">Les petits plus de la carte</h2>
     <ul class="mx-auto mt-8 grid max-w-6xl grid-cols-2 gap-y-8 text-center font-serif text-lg md:grid-cols-4 md:divide-x md:divide-lin">
       <li class="px-4">Un petit mot<br />écrit à la main</li>
-      <li class="px-4">Envoyée<br />par la poste</li>
+      <li class="px-4">Retirée avec votre commande<br />ou envoyée par la poste</li>
       <li class="px-4">Utilisable en une<br />ou plusieurs fois</li>
       <li class="px-4">Valable sur<br />tout le site</li>
     </ul>
@@ -110,17 +122,20 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
   {VENTE_EN_LIGNE && <section class="mx-auto max-w-3xl px-4 py-14">
     <h2 class="h-title text-xl">Questions fréquentes</h2>
     <details class="mt-6 border-t border-lin py-4"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Comment l'offrir ?</summary>
-      <p class="mt-3 text-sm/6">Choisissez un montant, indiquez à qui l'envoyer et écrivez votre petit mot. Nous le recopions à la main sur la carte, puis nous l'envoyons par la poste, directement à la personne.</p></details>
+      <p class="mt-3 text-sm/6">Choisissez un montant, la personne à qui l'offrir et écrivez votre petit mot. Nous le recopions à la main sur la carte. Vous la retirez avec votre commande, ou nous l'envoyons par la poste, directement à la personne.</p></details>
     <details class="border-t border-lin py-4"><summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider">Comment l'utiliser ?</summary>
-      <p class="mt-3 text-sm/6">Le code est inscrit au dos de la carte. Il se saisit au moment de valider une commande sur le site, en une ou plusieurs fois.</p></details>
+      <p class="mt-3 text-sm/6">Le code est inscrit au dos de la carte. Il se saisit dans le panier, au moment de valider une commande sur le site, en une ou plusieurs fois. Le solde se consulte dans l'onglet « J'ai une carte ».</p></details>
     <div class="border-t border-lin"></div>
   </section>}
 
   <script>
-    const MIN = 15, MAX = 200;
     // Site vitrine : pas de formulaire, rien à faire
     const form = document.querySelector<HTMLFormElement>('form[data-section="offrir"]');
     if (form) {
+    const MIN = Number(form.querySelector<HTMLInputElement>('#cc-montant')!.min), MAX = Number(form.querySelector<HTMLInputElement>('#cc-montant')!.max);
+    const blocAdresse = form.querySelector<HTMLElement>('[data-adresse]')!;
+    const parPoste = () => (form.querySelector<HTMLInputElement>('input[name="remise"]:checked')?.value === 'poste');
+    form.querySelectorAll('input[name="remise"]').forEach((r) => r.addEventListener('change', () => { blocAdresse.hidden = !parPoste(); }));
     const montant = form.querySelector<HTMLInputElement>('#cc-montant')!;
     const boutons = [...form.querySelectorAll<HTMLButtonElement>('[data-montant]')];
     const mot = form.querySelector<HTMLTextAreaElement>('#cc-mot')!;
@@ -147,8 +162,8 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
       const probleme =
         !Number.isInteger(somme) || somme < MIN || somme > MAX ? [`Choisissez un montant entier entre ${MIN} € et ${MAX} €.`, montant] :
         !v('prenom') || !v('nom') ? ['Indiquez le prénom et le nom de la personne.', form.querySelector('#cc-prenom')] :
-        !v('adresse') || !v('ville') ? ['Indiquez l’adresse où envoyer la carte.', form.querySelector('#cc-adresse')] :
-        !/^[0-9]{5}$/.test(v('cp')) ? ['Le code postal doit contenir 5 chiffres.', form.querySelector('#cc-cp')] :
+        parPoste() && (!v('adresse') || !v('ville')) ? ['Indiquez l’adresse où envoyer la carte.', form.querySelector('#cc-adresse')] :
+        parPoste() && !/^[0-9]{5}$/.test(v('cp')) ? ['Le code postal doit contenir 5 chiffres.', form.querySelector('#cc-cp')] :
         !v('mot') ? ['Écrivez votre petit mot : nous le recopions à la main.', mot] :
         !v('de') ? ['Indiquez de la part de qui vient la carte.', form.querySelector('#cc-de')] : null;
       if (probleme) {
@@ -157,16 +172,30 @@ const onglet = 'border-b-2 border-transparent pb-1 text-xs font-semibold upperca
         return;
       }
       erreur.hidden = true;
-      const details = { prenom: v('prenom'), nom: v('nom'), adresse: v('adresse'), cp: v('cp'), ville: v('ville'), mot: v('mot'), de: v('de') };
+      const details: Record<string, string> = { remise: parPoste() ? 'poste' : 'retrait', prenom: v('prenom'), nom: v('nom'), mot: v('mot'), de: v('de') };
+      if (parPoste()) Object.assign(details, { adresse: v('adresse'), cp: v('cp'), ville: v('ville') });
       let panier: unknown[] = [];
       try { panier = JSON.parse(localStorage.getItem('ma-cart') || '[]'); } catch {}
       panier.push({ id: `carte-cadeau-${Date.now()}`, name: `Carte cadeau ${eur(somme)} pour ${details.prenom}`, price: somme, qty: 1, details });
       localStorage.setItem('ma-cart', JSON.stringify(panier));
       window.dispatchEvent(new Event('panier-change'));
-      form.reset(); marquer();
+      form.reset(); marquer(); blocAdresse.hidden = true;
       form.querySelector('[data-compteur]')!.textContent = '0';
       ok.textContent = `La carte cadeau de ${eur(somme)} pour ${details.prenom} est dans votre panier.`;
       ok.hidden = false;
+    });
+
+    // J'ai une carte : consultation du solde (le serveur ne renvoie que le solde)
+    const formSolde = document.querySelector<HTMLFormElement>('[data-solde]')!;
+    const infoSolde = document.querySelector<HTMLElement>('[data-solde-info]')!;
+    formSolde.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      infoSolde.textContent = 'Vérification…';
+      try {
+        const r = await fetch('/api/carte-cadeau', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: formSolde.querySelector<HTMLInputElement>('#cc-code')!.value }) });
+        const j = await r.json().catch(() => ({}));
+        infoSolde.textContent = r.status === 429 ? 'Trop d’essais : réessayez dans quelques minutes.' : r.ok ? `Carte ${j.code} : il reste ${eur(j.solde / 100)}.` : j.erreur || 'Code introuvable.';
+      } catch { infoSolde.textContent = 'Impossible de vérifier pour le moment.'; }
     });
     }
   </script>

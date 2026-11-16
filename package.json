@@ -1,6 +1,17 @@
 {
   "name": "maison-allumette",
   "type": "module",
-  "scripts": { "dev": "astro dev", "build": "astro build", "preview": "astro preview", "admin:acces": "node scripts/creer-acces.mjs" },
-  "dependencies": { "astro": "^5.0.0", "tailwindcss": "^4.0.0", "@tailwindcss/vite": "^4.0.0" }
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "admin:acces": "node scripts/creer-acces.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "11.1.7",
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^5.0.0",
+    "stripe": "23.0.1",
+    "tailwindcss": "^4.0.0"
+  }
 }

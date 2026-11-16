@@ -1,16 +1,16 @@
-// Réglages généraux du site.
+// Réglages généraux du site. Les valeurs partagées avec le serveur (retrait, Pop-Up, carte cadeau) sont dans site.json.
+import site from './site.json';
 
-// Site vitrine tant que le paiement n'est pas branché : pas de panier ni de bouton « Ajouter au panier », les prix restent affichés.
-// Passer à true pour réactiver le panier (il faudra aussi brancher le paiement : SumUp ou Stripe).
-export const VENTE_EN_LIGNE = false;
+// Site vitrine tant que la vente n'est pas ouverte : pas de panier ni de bouton « Ajouter au panier », les prix restent affichés.
+// Pour ouvrir la vente : variable Netlify PUBLIC_VENTE_EN_LIGNE = true, puis redéployer (rien à changer dans le code).
+// Le paiement passe par Stripe (variables STRIPE_SECRET_KEY et STRIPE_WEBHOOK_SECRET).
+export const VENTE_EN_LIGNE = import.meta.env.PUBLIC_VENTE_EN_LIGNE === 'true';
 
 // Pop-Up Store de Noël à Mont-de-Marsan (association Pop-Up Store MDM).
 // Le lien de l'en-tête disparaît tout seul après la fermeture.
-export const POPUP = {
-  ouverture: '2026-11-20T10:00:00+01:00',
-  fermeture: '2026-12-24T18:00:00+01:00',
-  adresse: '43, rue Léon Gambetta',
-  ville: 'Mont-de-Marsan',
-  instagram: 'https://www.instagram.com/pop.up.store.mdm/',
-  carte: 'https://www.google.com/maps/search/?api=1&query=43+rue+L%C3%A9on+Gambetta+40000+Mont-de-Marsan',
-};
+export const POPUP = site.popup;
+
+// Retrait gratuit : au Pop-Up Store pendant son ouverture, chez Atelier Cruchon le reste de l'année.
+export const RETRAIT = site.retrait;
+export const CARTE_CADEAU = site.carteCadeau;
+export const MENTION_TVA = site.mentionTva;

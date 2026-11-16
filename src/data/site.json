@@ -1,0 +1,16 @@
+{
+  "popup": {
+    "ouverture": "2026-11-20T10:00:00+01:00",
+    "fermeture": "2026-12-24T18:00:00+01:00",
+    "adresse": "43, rue Léon Gambetta",
+    "ville": "Mont-de-Marsan",
+    "instagram": "https://www.instagram.com/pop.up.store.mdm/",
+    "carte": "https://www.google.com/maps/search/?api=1&query=43+rue+L%C3%A9on+Gambetta+40000+Mont-de-Marsan"
+  },
+  "retrait": {
+    "popup": { "nom": "Pop-Up Store de Noël", "adresse": "43, rue Léon Gambetta, 40000 Mont-de-Marsan" },
+    "atelier": { "nom": "Atelier Cruchon", "adresse": "" }
+  },
+  "carteCadeau": { "min": 15, "max": 200, "envoiPostal": 0 },
+  "mentionTva": "TVA non applicable, art. 293 B du CGI"
+}

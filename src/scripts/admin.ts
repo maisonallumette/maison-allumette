@@ -19,7 +19,7 @@ type Draft = { catalogue: Catalogue; files: Record<string, string | null>; baseS
 const racine = document.getElementById('admin')!;
 let enLigne: Catalogue | null = null;
 let draft: Draft | null = null;
-let onglet: 'produits' | 'categories' = 'produits';
+let onglet: 'produits' | 'categories' | 'commandes' = 'produits';
 let edition: string | null = null; // slug du produit modifié, 'nouveau', ou null pour la liste
 let occupe = false;
 let message: { texte: string; erreur: boolean } | null = null;
@@ -332,8 +332,8 @@ function afficher() {
       h('div', { class: 'mt-3 flex flex-wrap gap-2' },
         h('button', { type: 'button', class: cn.btnPlein, disabled: !n || occupe, onclick: publier }, 'Publier sur le site'),
         n > 0 && h('button', { type: 'button', class: cn.btn, disabled: occupe, onclick: abandonner }, 'Tout abandonner'))),
-    h('nav', { class: 'mt-6 flex border-b border-lin' }, bouton('produits', 'Produits'), bouton('categories', 'Catégories')),
-    onglet === 'categories' ? ecranCategories() : edition ? ecranProduit(edition) : ecranListe(),
+    h('nav', { class: 'mt-6 flex border-b border-lin' }, bouton('produits', 'Produits'), bouton('categories', 'Catégories'), bouton('commandes', 'Commandes')),
+    onglet === 'categories' ? ecranCategories() : onglet === 'commandes' ? ecranCommandes() : edition ? ecranProduit(edition) : ecranListe(),
   );
 }
 
@@ -505,6 +505,95 @@ function ecranCategories() {
         h('button', { type: 'button', class: cn.btn, 'aria-label': `Renommer ${s.name}`, onclick: () => renommerSub(x, s) }, 'Renommer'),
         h('button', { type: 'button', class: cn.btnDanger, 'aria-label': `Supprimer ${s.name}`, onclick: () => supprimerSub(x, s) }, 'Supprimer')))),
       h('div', { class: 'mt-3' }, ajout(`nouvelle-sous-${x.slug}`, 'Nouvelle sous-catégorie', (nom) => ajouterSub(x, nom)))))),
+  );
+}
+
+/* ---------- Commandes et cartes cadeaux (boutique en ligne) ---------- */
+
+type LigneCarte = { montant: number; remise: string; prenom: string; nom: string; mot: string; de: string; adresse?: string; cp?: string; ville?: string; code?: string };
+type Commande = {
+  id: string; ref: string; creeLe: string; payeeLe?: string; statut: 'payee' | 'retiree'; paiement?: string; montantPaye?: number;
+  lieu: { nom: string; adresse: string }; client: { nom: string; email: string; telephone: string };
+  articles: { nom: string; qte: number; prix: number }[]; cartes: LigneCarte[]; carteUtilisee?: { code: string; montant: number }; alerte?: string;
+};
+type CarteCadeau = { code: string; montant: number; solde: number; creeLe: string; pour: string; de: string; remise: string };
+let ventes: { commandes: Commande[]; cartes: CarteCadeau[] } | null = null;
+let ventesEnCours = false;
+const euros = (c: number) => eur(c / 100);
+const quand = (d?: string) => (d ? new Date(d).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }) : '');
+
+async function chargerVentes() {
+  if (ventesEnCours) return;
+  ventesEnCours = true;
+  try {
+    ventes = await api('/commandes');
+  } catch (e) {
+    if (e instanceof ErreurApi && e.status === 401) { ventesEnCours = false; sessionPerdue(); return; }
+    message = { texte: (e as Error).message, erreur: true };
+  }
+  ventesEnCours = false;
+  afficher();
+}
+
+async function changerStatut(c: Commande, statut: 'payee' | 'retiree') {
+  try {
+    await api('/commande-statut', { id: c.id, statut });
+    c.statut = statut;
+    afficher();
+  } catch (e) {
+    if (e instanceof ErreurApi && e.status === 401) { sessionPerdue(); return; }
+    dire((e as Error).message, true);
+  }
+}
+
+function carteCommande(c: Commande) {
+  const aPreparer = c.statut === 'payee';
+  return h('li', { class: `border bg-white p-4 ${aPreparer ? 'border-olive' : 'border-lin opacity-70'}` },
+    h('div', { class: 'flex flex-wrap items-baseline justify-between gap-2' },
+      h('p', { class: 'font-semibold' }, `Commande ${c.ref}`),
+      h('p', { class: `text-xs font-semibold uppercase tracking-wider ${aPreparer ? 'text-[#a83c14]' : ''}` }, aPreparer ? 'À préparer' : 'Retirée')),
+    h('p', { class: 'text-xs' }, `Payée le ${quand(c.payeeLe)}${c.paiement === 'carte cadeau' ? ' · entièrement par carte cadeau' : ` · ${euros(c.montantPaye ?? 0)} par carte bancaire`}`),
+    c.alerte && h('p', { role: 'alert', class: 'mt-2 border border-terracotta p-2 text-sm' }, c.alerte),
+    h('p', { class: 'mt-3 text-sm' }, h('span', { class: 'font-semibold' }, c.client.nom), ' · ',
+      h('a', { href: `mailto:${c.client.email}`, class: 'underline' }, c.client.email), ' · ',
+      h('a', { href: `tel:${c.client.telephone.replace(/\s/g, '')}`, class: 'underline' }, c.client.telephone)),
+    h('p', { class: 'text-sm' }, `Retrait : ${c.lieu.nom}`),
+    c.articles.length > 0 && h('ul', { class: 'mt-3 list-disc pl-5 text-sm' }, ...c.articles.map((a) => h('li', {}, `${a.qte} × ${a.nom}`))),
+    ...c.cartes.map((k) => h('div', { class: 'mt-3 border-l-2 border-terracotta pl-3 text-sm' },
+      h('p', { class: 'font-semibold' }, `Carte cadeau ${euros(k.montant)} pour ${k.prenom} ${k.nom}`),
+      h('p', {}, 'Code à écrire au dos : ', h('span', { class: 'font-mono font-semibold' }, k.code ?? 'en cours de création')),
+      h('p', {}, k.remise === 'poste' ? `À envoyer par la poste : ${k.adresse}, ${k.cp} ${k.ville}` : 'Remise avec la commande'),
+      h('p', { class: 'mt-1 whitespace-pre-line italic' }, `« ${k.mot} » — ${k.de}`))),
+    c.carteUtilisee && h('p', { class: 'mt-3 text-sm' }, `Carte ${c.carteUtilisee.code} utilisée : − ${euros(c.carteUtilisee.montant)}`),
+    h('div', { class: 'mt-4' },
+      aPreparer
+        ? h('button', { type: 'button', class: cn.btnPlein, onclick: () => changerStatut(c, 'retiree') }, 'Marquer comme retirée')
+        : h('button', { type: 'button', class: cn.btn, onclick: () => changerStatut(c, 'payee') }, 'Remettre « à préparer »')),
+  );
+}
+
+function ecranCommandes() {
+  if (!ventes) {
+    chargerVentes();
+    return h('p', { class: 'py-10 text-center text-sm' }, 'Chargement des commandes…');
+  }
+  const { commandes, cartes } = ventes;
+  const aPreparer = commandes.filter((c) => c.statut === 'payee');
+  const retirees = commandes.filter((c) => c.statut === 'retiree');
+  return h('section', { class: 'mt-4' },
+    h('div', { class: 'flex items-center justify-between gap-2' },
+      h('p', { class: 'text-sm' }, aPreparer.length ? `${aPreparer.length} commande${aPreparer.length > 1 ? 's' : ''} à préparer` : 'Aucune commande à préparer'),
+      h('button', { type: 'button', class: cn.btn, onclick: () => { ventes = null; afficher(); } }, 'Actualiser')),
+    commandes.length === 0 && h('p', { class: 'mt-6 text-sm' }, 'Aucune commande payée pour le moment. Les paiements apparaissent aussi dans votre tableau de bord Stripe.'),
+    h('ul', { class: 'mt-4 space-y-3' }, ...aPreparer.map(carteCommande)),
+    retirees.length > 0 && h('details', { class: 'mt-6' }, h('summary', { class: 'cursor-pointer text-xs font-semibold uppercase tracking-wider' }, `Commandes retirées (${retirees.length})`),
+      h('ul', { class: 'mt-3 space-y-3' }, ...retirees.map(carteCommande))),
+    h('h2', { class: 'h-title mt-10 text-lg' }, 'Cartes cadeaux'),
+    cartes.length === 0
+      ? h('p', { class: 'mt-3 text-sm' }, 'Aucune carte cadeau vendue pour le moment.')
+      : h('ul', { class: 'mt-3 divide-y divide-lin border-y border-lin' }, ...cartes.map((k) => h('li', { class: 'flex flex-wrap items-baseline justify-between gap-2 py-3 text-sm' },
+        h('div', {}, h('p', { class: 'font-mono font-semibold' }, k.code), h('p', { class: 'text-xs' }, `Pour ${k.pour}, de ${k.de} · ${quand(k.creeLe)}`)),
+        h('p', {}, `Solde ${euros(k.solde)} sur ${euros(k.montant)}`)))),
   );
 }
 

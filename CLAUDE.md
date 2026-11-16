@@ -9,15 +9,16 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 - Le dossier du projet est `C:\Users\user\maison-allumette`. Ne jamais mélanger avec le site La Régence.
 
 ## Fichiers clés
-- `src/data/site.ts` : `VENTE_EN_LIGNE` (false = site vitrine : ni panier ni bouton d'achat, prix affichés ; true pour rouvrir la vente une fois le paiement branché) et infos du Pop-Up Store (dates, adresse).
+- `src/data/site.ts` + `src/data/site.json` : `VENTE_EN_LIGNE` vient de la variable Netlify `PUBLIC_VENTE_EN_LIGNE` (absente = site vitrine : ni panier ni bouton d'achat, prix affichés ; `true` puis redéployer = vente ouverte). `site.json` (lu aussi par le serveur) : Pop-Up Store (dates, adresse), lieux de retrait, montants et envoi postal des cartes cadeaux, mention TVA (micro-entreprise : « TVA non applicable, art. 293 B du CGI »).
+- Boutique (Stripe Checkout) : `src/pages/panier.astro` (panier, coordonnées, carte cadeau à utiliser), `src/pages/commande/merci.astro`, `netlify/functions/commande.mjs` (prix recalculés depuis le catalogue, session Stripe), `stripe-webhook.mjs` (paiement confirmé : commande payée, codes de cartes cadeaux créés, carte utilisée débitée), `carte-cadeau.mjs` (solde), `netlify/lib/boutique.mjs`. Commandes et cartes cadeaux stockées dans Netlify Blobs (magasins `commandes` et `cartes-cadeaux`), visibles dans l'onglet Commandes de l'admin. Pas de livraison : retrait gratuit au Pop-Up Store pendant son ouverture, chez Atelier Cruchon le reste de l'année (adresse à compléter dans `site.json`). Carte cadeau : retirée avec la commande ou envoyée par la poste, utilisable en plusieurs fois (code MA-XXXX-XXXX).
 - `src/pages/pop-up-store.astro` + `src/components/PopupLien.astro` : Pop-Up Store de Noël de Mont-de-Marsan (20 nov. – 24 déc. 2026), couleurs et écriture du Pop-Up (Story Script ; Unbounded à la place de Hagrid, police payante). Le lien de l'en-tête disparaît après la fermeture.
 - `src/styles/global.css` : thème provisoire (couleurs, polices), `.h-title`, `.vichy` (motif vichy), `.papier-peint` (larges bandes beiges sur crème), comportement de l'en-tête.
 - `src/layouts/Base.astro` : en-tête (transparent en haut, bandeau blanc après 90 px de défilement ; catégories à gauche, sauf la catégorie d'adresse `collections-capsules`, placée à droite avant la loupe et le panier), panneau du menu (ouvert par une catégorie, la loupe ou le burger : onglets des catégories, recherche, sous-catégories, deux produits sur grand écran ; la flèche « › » d'une ligne élargit le cadre pour montrer ses produits), newsletter, pied de page, panier en localStorage.
-- `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit en trois cadres : bandeau blanc, photo fixe à gauche, informations sur fond crème à droite ; barre d'achat fixe sur téléphone), `carte-cadeau.astro` (« Offrir Maison Allumette » : carte envoyée avec un mot écrit à la main ; paiement et codes encore à brancher).
+- `src/pages/index.astro` (accueil, prop `overlay`), `boutique.astro` (filtre par `?q=`), `produits/[slug].astro` (fiche produit en trois cadres : bandeau blanc, photo fixe à gauche, informations sur fond crème à droite ; barre d'achat fixe sur téléphone), `histoire.astro` (Notre histoire : Adeline et la fabrication en 5 étapes, photos de `public/images/atelier/`, aussi utilisées dans la section « Dans l'atelier » de l'accueil), `carte-cadeau.astro` (« Offrir Maison Allumette » : carte envoyée avec un mot écrit à la main ; paiement et codes encore à brancher).
 - `src/components/ProductCard.astro`, `Seal.astro` (sceau officiel, crème et orange), `CarteCadeau.astro` (modèle de la carte cadeau, aussi en bas de l'accueil), `PhotoCadree.astro` (photo carrée avec le cadrage choisi dans l'admin : champ `cadrage` du produit, voir `src/data/cadrage.ts`).
 - `src/data/catalogue.json` : catégories, sous-catégories et produits (descriptions d'exemple à remplacer). Lu par `src/data/products.ts`, modifié depuis `/admin/`.
 - `src/pages/admin/index.astro` + `src/scripts/admin.ts` : page admin avec identifiant et mot de passe. Brouillon dans le navigateur, puis un seul commit sur `main`.
-- `netlify/functions/` et `netlify/lib/acces.mjs` : connexion, session et écriture sur GitHub côté serveur. Variables Netlify : `ADMIN_IDENTIFIANT`, `ADMIN_MOT_DE_PASSE_EMPREINTE`, `ADMIN_SESSION_SECRET`, `ADMIN_GITHUB_JETON`. `npm run admin:acces` génère les trois premières (aussi pour changer le mot de passe, puis redéployer).
+- `netlify/functions/` et `netlify/lib/acces.mjs` : connexion, session et écriture sur GitHub côté serveur. Variables Netlify : `ADMIN_IDENTIFIANT`, `ADMIN_MOT_DE_PASSE_EMPREINTE`, `ADMIN_SESSION_SECRET`, `ADMIN_GITHUB_JETON`, et pour la vente `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `PUBLIC_VENTE_EN_LIGNE`. `npm run admin:acces` génère les trois premières (aussi pour changer le mot de passe, puis redéployer).
 
 ## Direction artistique
 - Inspiration de structure : fragonard.com (en-tête 3 zones, bandeau d'accueil coupé en deux, grille produits, fiche produit mobile avec barre d'achat fixe). Ne jamais copier leurs textes, images, logo ni code.
@@ -33,8 +34,8 @@ Marque artisanale française de bougies fleuries, fondants, suspensions, diffuse
 ## À faire
 - Intégrer logos, polices, photos de la DA et photos produits.
 - Vrais produits, prix, variantes, numéros de lot, conseils d'utilisation et composition.
-- Pages manquantes : Notre histoire, Contact, CGV, mentions légales, livraison et retours, confidentialité.
-- Paiement : relier « Valider ma commande » (SumUp ou Stripe). Le panier actuel ne passe pas de vraie commande.
+- Pages manquantes : Contact, CGV, mentions légales, livraison et retours, confidentialité.
+- Ouvrir la vente : compte Stripe, clés et webhook (`https://<site>/api/stripe-webhook`, événements `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`), adresse d'Atelier Cruchon, pages CGV et mentions légales, puis `PUBLIC_VENTE_EN_LIGNE=true`. Tester d'abord en mode test Stripe.
 - Newsletter : brancher un service d'e-mailing.
 
 ## Règles

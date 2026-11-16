@@ -49,6 +49,23 @@ const reassurance = [...(VENTE_EN_LIGNE ? [['Paiement sécurisé','Carte bancair
       <a href={`/boutique?categorie=${c.slug}`} class="flex aspect-[4/3] items-end justify-center bg-sauge p-4"><h3 class="h-title text-center text-lg text-creme min-[360px]:text-2xl">{c.name}</h3></a>))}
   </section>
 
+  <!-- DANS L'ATELIER (photos d'Adeline au travail) -->
+  <section class="mx-auto mt-16 max-w-6xl px-4">
+    <div class="grid gap-6 bg-white/80 p-4 md:grid-cols-[5fr_6fr] md:items-center md:gap-10 md:p-8">
+      <img src="/images/atelier/atelier-adeline.jpg" alt="Adeline dans son atelier, devant une table couverte de bougies" loading="lazy" class="aspect-[4/5] w-full object-cover" />
+      <div>
+        <p class="text-[11px] font-semibold uppercase tracking-[.3em]">Dans l'atelier</p>
+        <h2 class="h-title mt-3 text-2xl md:text-3xl">Fait main, une à une</h2>
+        <p class="mt-4 font-serif text-lg italic">Chaque bougie est coulée à la main par Adeline, dans son atelier des Landes, puis fleurie une à une.</p>
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <img src="/images/atelier/atelier-fleurs.jpg" alt="Des fleurs séchées posées une à une sur une bougie" loading="lazy" class="aspect-square w-full object-cover" />
+          <img src="/images/atelier/atelier-coulage.jpg" alt="La cire versée dans des moules à fondants" loading="lazy" class="aspect-square w-full object-cover" />
+        </div>
+        <a href="/histoire" class="mt-6 inline-block border border-olive bg-white px-8 py-3 text-xs font-semibold uppercase tracking-wider transition hover:bg-olive hover:text-creme">Notre histoire</a>
+      </div>
+    </div>
+  </section>
+
   <!-- RÉASSURANCE -->
   <section class="mx-auto mt-16 grid max-w-6xl grid-cols-2 border-y border-lin px-4 md:grid-cols-4">
     {reassurance.map(([t, d]) => <div class="border-b border-lin p-6 text-center md:border-b-0"><p class="h-title text-sm">{t}</p><p class="mt-2 font-serif text-sm italic">{d}</p></div>)}

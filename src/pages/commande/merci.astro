@@ -1,0 +1,30 @@
+---
+// Retour après paiement (ou commande payée par carte cadeau) : on vide le panier et on rappelle le retrait.
+import Base from '../../layouts/Base.astro';
+import { POPUP, RETRAIT } from '../../data/site';
+---
+<Base title="Merci ! | Maison Allumette" bandeau>
+  <section class="mx-auto max-w-2xl px-4 py-16 text-center md:py-24" data-merci data-reglages={JSON.stringify({ popup: POPUP, retrait: RETRAIT })}>
+    <img src="/brand/ma-sceau-creme.jpg" alt="" class="mx-auto w-24 rounded-full shadow-md" />
+    <h1 class="h-title mt-8 text-3xl">Merci pour votre commande</h1>
+    <p data-ref class="mt-3 text-sm font-semibold uppercase tracking-wider"></p>
+    <p class="mt-6 font-serif text-lg italic">Vous allez recevoir un reçu par e-mail. Nous vous prévenons dès que votre commande est prête.</p>
+    <div class="mt-8 border border-lin bg-white/90 p-5 text-sm/6">
+      <p class="h-title text-sm">Retrait gratuit</p>
+      <p data-lieu class="mt-2"></p>
+    </div>
+    <a href="/boutique" class="mt-10 inline-block border border-olive bg-white px-8 py-3 text-xs font-semibold uppercase tracking-wider transition hover:bg-olive hover:text-creme">Continuer la visite</a>
+  </section>
+  <script>
+    const bloc = document.querySelector<HTMLElement>('[data-merci]')!;
+    const { popup, retrait } = JSON.parse(bloc.dataset.reglages!);
+    // Le paiement est terminé : le panier est vidé
+    try { localStorage.removeItem('ma-cart'); } catch {}
+    window.dispatchEvent(new Event('panier-change'));
+    const ref = (new URLSearchParams(location.search).get('ref') || '').replace(/[^A-Z0-9]/gi, '').slice(0, 12);
+    if (ref) bloc.querySelector('[data-ref]')!.textContent = `Commande ${ref.toUpperCase()}`;
+    const t = Date.now();
+    const lieu = t >= Date.parse(popup.ouverture) && t < Date.parse(popup.fermeture) ? retrait.popup : retrait.atelier;
+    bloc.querySelector('[data-lieu]')!.textContent = lieu.adresse ? `${lieu.nom}, ${lieu.adresse}` : lieu.nom;
+  </script>
+</Base>
