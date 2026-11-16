@@ -245,6 +245,24 @@
       "notes": [],
       "conseils": "",
       "composition": ""
+    },
+    {
+      "slug": "test",
+      "name": "TEST",
+      "category": "suspensions",
+      "subcategory": "",
+      "price": 2222,
+      "image": "/images/produits/test.jpg",
+      "cadrage": {
+        "x": 50,
+        "y": 50,
+        "zoom": 1
+      },
+      "short": "TEST TEST",
+      "description": "TEST",
+      "notes": [],
+      "conseils": "",
+      "composition": ""
     }
   ]
 }
